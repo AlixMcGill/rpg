@@ -1,7 +1,9 @@
 #include "game.h"
+#include <raylib.h>
 
 void Game::init() {
     std::cout << "Game class init" << std::endl;
+    InitAudioDevice();
 }
 
 void Game::update(float deltaTime) {
@@ -16,5 +18,5 @@ void Game::draw() {
 
 void Game::destroy() {
     std::cout << "Game class destroy" << std::endl;
-
+    CloseAudioDevice();
 }
