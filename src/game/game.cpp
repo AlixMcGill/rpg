@@ -1,22 +1,30 @@
 #include "game.h"
-#include <raylib.h>
 
 void Game::init() {
     std::cout << "Game class init" << std::endl;
     InitAudioDevice();
+    m_tilemap.loadTexture("assets/Dungeon_Tileset.png");
+    m_tilemap.initMap();
+    m_tilemap.initCamera();
 }
 
 void Game::update(float deltaTime) {
     std::cout << "Game class update" << std::endl;
-
+    m_tilemap.cameraZoom();
 }
 
 void Game::draw() {
     std::cout << "Game class draw" << std::endl;
+    BeginMode2D(m_tilemap.camera);
+    m_tilemap.renderMap();
 
+    EndMode2D();
+
+    dev.devstats(m_tilemap.camera);
 }
 
 void Game::destroy() {
     std::cout << "Game class destroy" << std::endl;
     CloseAudioDevice();
+    m_tilemap.destroyTextures();
 }

@@ -1,5 +1,7 @@
 #pragma once
 #include "../utils/project.h"
+#include "../dev/devstats.h"
+#include "tilemap.h"
 
 class Game {
 public:
@@ -9,4 +11,6 @@ public:
     void destroy();
 
 private:
+    Tilemap m_tilemap;
+    DevStats dev;
 };
