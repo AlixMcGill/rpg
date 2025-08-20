@@ -1,7 +1,10 @@
 #pragma once
 #include "../utils/project.h"
 
-class DevStats {
+class Entity {
 public:
-    void devstats(Camera2D &camera);
+    int xPos;
+    int yPos;
+
+private:
 };

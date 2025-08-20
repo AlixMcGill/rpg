@@ -2,6 +2,7 @@
 #include "../utils/project.h"
 #include "../dev/devstats.h"
 #include "tilemap.h"
+#include "player.h"
 
 class Game {
 public:
@@ -13,4 +14,5 @@ public:
 private:
     Tilemap m_tilemap;
     DevStats dev;
+    Player player;
 };

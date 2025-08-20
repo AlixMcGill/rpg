@@ -1,5 +1,4 @@
 #include "devstats.h"
-#include <raylib.h>
 
 void DevStats::devstats(Camera2D &camera) {
     if (!DEVTOOLS) return;

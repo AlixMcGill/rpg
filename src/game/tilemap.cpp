@@ -63,5 +63,11 @@ void Tilemap::cameraZoom() {
         if (camera.zoom > 4.0f) camera.zoom = 4.0f;
     }
 
-    camera.target = (Vector2){ 0, 0 };
+    camera.target = cameraTarget;
+}
+
+void Tilemap::updateCameraTarget(float x, float y) {
+    camera.target = (Vector2){ x, y };
+    cameraTarget.x = x;
+    cameraTarget.y = y;
 }
