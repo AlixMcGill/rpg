@@ -26,7 +26,7 @@ void Game::draw() {
 
     EndMode2D();
 
-    dev.devstats(m_tilemap.camera);
+    dev.devstats(m_tilemap.camera, player);
 }
 
 void Game::destroy() {

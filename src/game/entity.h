@@ -1,10 +1,14 @@
 #pragma once
 #include "../utils/project.h"
+#include <raylib.h>
 
 class Entity {
 public:
-    int xPos;
-    int yPos;
+    float xPos;
+    float yPos;
+
+    Vector2 vel;
+    Vector2 accel;
 
 private:
 };

@@ -1,6 +1,6 @@
 #include "devstats.h"
 
-void DevStats::devstats(Camera2D &camera) {
+void DevStats::devstats(Camera2D &camera, Player &player) {
     if (!DEVTOOLS) return;
 
     DrawRectangle(5, 5, 330, 120, Fade(SKYBLUE, 0.5f));
@@ -8,4 +8,5 @@ void DevStats::devstats(Camera2D &camera) {
 
     DrawText(TextFormat("Camera Target: (%06.2f, %06.2f)", camera.target.x, camera.target.y), 15, 10, 14, YELLOW);
     DrawText(TextFormat("Camera Zoom: %06.2f", camera.zoom), 15, 30, 14, YELLOW);
+    DrawText(TextFormat("Stamina: %06.2f", player.stamina), 15, 50, 14, YELLOW);
 }
