@@ -14,14 +14,14 @@ void Game::init() {
 }
 
 void Game::update(float deltaTime) {
-    std::cout << "Game class update" << std::endl;
+    //std::cout << "Game class update" << std::endl;
     player.update(deltaTime, m_tilemap.worldCollisionLayer);
     m_tilemap.updateCameraTarget(player.xPos, player.yPos);
     m_tilemap.cameraZoom();
 }
 
 void Game::draw() {
-    std::cout << "Game class draw" << std::endl;
+    //std::cout << "Game class draw" << std::endl;
     BeginMode2D(m_tilemap.camera);
     m_tilemap.renderMap();
     player.draw();

@@ -37,20 +37,63 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
             if (m_playerTileX > 5) {
                 m_playerTileX = 0;
             }
-        } else if (currentState == WALK_RIGHT) {
+        } else if (currentState == WALK_RIGHT || currentState == WALK_LEFT) {
             m_playerTileY = 4;
             m_playerTileX++;
 
             if (m_playerTileX > 5) {
                 m_playerTileX = 0;
             }
-        } else if (currentState == WALK_LEFT) {
-            m_playerTileY = 4;
-            m_playerTileX--;
+        } else if (currentState == IDLE_UP) {
+            m_playerTileY = 2;
+            m_playerTileX++;
 
-            if (m_playerTileX < 0) {
-                m_playerTileX = 5;
+            if (m_playerTileX > 5) {
+                m_playerTileX = 0;
             }
+        } else if (currentState == IDLE_DOWN) {
+            m_playerTileY = 0;
+            m_playerTileX++;
+
+            if (m_playerTileX > 5) {
+                m_playerTileX = 0;
+            }
+        } else if (currentState == IDLE_RIGHT || currentState == IDLE_LEFT) {
+            m_playerTileY = 1;
+            m_playerTileX++;
+
+            if (m_playerTileX > 5) {
+                m_playerTileX = 0;
+            }
+        }
+
+        if (isAnimating) {
+            if (currentState == ATTACK_DOWN) {
+                m_playerTileY = 6;
+                m_playerTileX++;
+
+                if (m_playerTileX > 3) {
+                    isAnimating = false;
+                    m_playerTileX = 3;
+                }
+            } else if (currentState == ATTACK_UP) {
+                m_playerTileY = 8;
+                m_playerTileX++;
+
+                if (m_playerTileX > 3) {
+                    isAnimating = false;
+                    m_playerTileX = 3;
+                }
+            } else if (currentState == ATTACK_RIGHT || currentState == ATTACK_LEFT) {
+                m_playerTileY = 7;
+                m_playerTileX++;
+
+                if (m_playerTileX > 3) {
+                    isAnimating = false;
+                    m_playerTileX = 3;
+                }
+            }
+
         }
     }
 
@@ -58,7 +101,7 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
     accel = {0,0};
 
     // handle running
-    if (IsKeyDown(KEY_RIGHT_SHIFT) || IsKeyDown(KEY_LEFT_SHIFT) && stamina > 1.0f) {
+    if ((IsKeyDown(KEY_RIGHT_SHIFT) || IsKeyDown(KEY_LEFT_SHIFT)) && stamina > 1.0f && (vel.x != 0 || vel.y != 0)) {
         if (stamina > 0.0f) {
             stamina -= 0.06f;
         }
@@ -121,26 +164,53 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
         stamina += 0.01f;
     }
 
-    if (IsKeyDown(KEY_W)) {
-        currentState = WALK_UP;
-    } else if (IsKeyDown(KEY_S)) {
-        currentState = WALK_DOWN;
-    } else if (IsKeyDown(KEY_A)) {
-        currentState = WALK_LEFT;
-    } else if (IsKeyDown(KEY_D)) {
-        currentState = WALK_RIGHT;
+    // mouse / player face
+    std::string mouseDir = m_getMouseDirection(); 
+
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !isAnimating && stamina >= 5.0f) {
+        if (mouseDir == "UP") currentState = ATTACK_UP;
+        else if (mouseDir == "DOWN") currentState = ATTACK_DOWN;
+        else if (mouseDir == "LEFT") currentState = ATTACK_LEFT;
+        else if (mouseDir == "RIGHT") currentState = ATTACK_RIGHT;
+        isAnimating = true;
+        m_playerTileX = 0;
+        stamina -= 5.0f;
+    } else if (!isAnimating) {
+        if ((vel.y != 0 || vel.x != 0) && mouseDir == "UP") {
+            currentState = WALK_UP;
+        } else if ((vel.y != 0 || vel.x != 0) && mouseDir == "DOWN") {
+            currentState = WALK_DOWN;
+        } else if ((vel.x != 0 || vel.y != 0) && mouseDir == "LEFT") {
+            currentState = WALK_LEFT;
+        } else if ((vel.x != 0 || vel.y != 0) && mouseDir == "RIGHT") {
+            currentState = WALK_RIGHT;
+        } else if ((vel.x == 0 && vel.y == 0) && mouseDir == "UP") {
+            currentState = IDLE_UP;
+        } else if ((vel.x == 0 && vel.y == 0) && mouseDir == "DOWN") {
+            currentState = IDLE_DOWN;
+        } else if ((vel.x == 0 && vel.y == 0) && mouseDir == "LEFT") {
+            currentState = IDLE_LEFT;
+        } else if ((vel.x == 0 && vel.y == 0) && mouseDir == "RIGHT") {
+            currentState = IDLE_RIGHT;
+        } else {
+            currentState = IDLE;
+        } 
     }
-    else {
-        currentState = IDLE;
-    }
+
 }
 
 void Player::draw() {
+    std::string mouseDir = m_getMouseDirection();
     Rectangle source = { (float)m_playerTileX * PLAYER_TILE_WIDTH, (float)m_playerTileY * PLAYER_TILE_HEIGHT, (float)PLAYER_TILE_WIDTH, (float)PLAYER_TILE_HEIGHT};
-    if (vel.x < 0) {
-        source.width = -source.width;
-        source.x += m_playerTileX * PLAYER_TILE_WIDTH;
+
+    if (mouseDir == "LEFT") {
+        source.x = (float)(m_playerTileX) * PLAYER_TILE_WIDTH; // right edge of current frame
+        source.width = -(float)PLAYER_TILE_WIDTH;                  // flip horizontally
+    } else {
+        source.x = (float)m_playerTileX * PLAYER_TILE_WIDTH;      // left edge of current frame
+        source.width = (float)PLAYER_TILE_WIDTH;
     }
+
     Rectangle dest = {(float)(xPos), (float)(yPos), (float)PLAYER_TILE_WIDTH, (float)PLAYER_TILE_HEIGHT};
     Vector2 origin = {16,16};
     DrawTexturePro(m_playerTexture, source, dest, origin, 0.0f, WHITE);
@@ -202,4 +272,20 @@ Rectangle Player::m_getCollisionBounds(float futureX, float futureY) const {
     float offsetY = (colliderHeight) / 2.0f;
 
     return {futureX + offsetX, futureY + offsetY, colliderWidth, colliderHeight};
+}
+std::string Player::m_getMouseDirection() {
+    Vector2 screenMid = {(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2};
+    Vector2 mousePos = GetMousePosition();
+
+    float mouseAngle = std::atan2f(mousePos.y - screenMid.y, mousePos.x - screenMid.x);
+
+    if (mouseAngle > -PI/4 && mouseAngle <= PI/4) {
+        return "RIGHT";
+    } else if (mouseAngle > PI/4 && mouseAngle <= 3*PI/4) {
+        return "DOWN";
+    } else if (mouseAngle <= -PI/4 && mouseAngle > -3*PI/4) {
+        return "UP";
+    } else {
+        return "LEFT";
+    }
 }

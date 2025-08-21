@@ -9,12 +9,22 @@ public:
     float stamina;
     float health;
 
+    bool isAnimating = false;
+
     enum state {
         IDLE,
+        IDLE_UP,
+        IDLE_DOWN,
+        IDLE_LEFT,
+        IDLE_RIGHT,
         WALK_UP,
         WALK_DOWN,
         WALK_LEFT,
         WALK_RIGHT,
+        ATTACK_UP,
+        ATTACK_DOWN,
+        ATTACK_LEFT,
+        ATTACK_RIGHT,
         RUN
     };
 
@@ -46,4 +56,5 @@ private:
     void m_setStartPos(int x, int y);
     void m_loadPlayerTexture(const char* imgPath);
     Rectangle m_getCollisionBounds(float futureX, float futureY) const;
+    std::string m_getMouseDirection();
 };

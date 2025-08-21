@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <cmath>
 
 #define TILE_WIDTH 16
 #define TILE_HEIGHT 16
