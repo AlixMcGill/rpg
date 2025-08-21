@@ -18,6 +18,7 @@ int main() {
         BeginDrawing();
         ClearBackground(GRAY);
         game.draw();
+        DrawFPS(1190, 10);
         EndDrawing();
     }
     game.destroy();

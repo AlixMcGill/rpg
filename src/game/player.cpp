@@ -1,4 +1,5 @@
 #include "player.h"
+#include "tilemap.h"
 #include <raylib.h>
 
 void Player::init() {
@@ -10,9 +11,9 @@ void Player::init() {
     stamina = 100.0f;
 }
 
-void Player::update(float deltaTime) {
+void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
     m_frameTimer += deltaTime;
-    if (m_frameTimer >= m_frameTime) {
+    if (m_frameTimer >= m_frameTime) { // Handles animations based off a timer
         m_frameTimer = 0.0f;
 
         if (currentState == IDLE) {
@@ -97,9 +98,22 @@ void Player::update(float deltaTime) {
     if (vel.y < -m_speed) vel.y = -m_speed;
 
     // update player position
-    //
-    xPos += vel.x * deltaTime;
-    yPos += vel.y * deltaTime;
+    // also handles collision
+    
+    Rectangle futureX = m_getCollisionBounds(xPos + vel.x * deltaTime, yPos);
+    if (!isColliding(futureX, worldCollisionLayer)) { 
+        xPos += vel.x * deltaTime;
+    } else {
+        vel.x = 0;
+    }
+
+    Rectangle futureY = m_getCollisionBounds(xPos, yPos + vel.y * deltaTime);
+    if (!isColliding(futureY, worldCollisionLayer)) {
+        yPos += vel.y * deltaTime;
+    } else {
+        vel.y = 0;
+    }
+
 
     if (stamina > m_maxStamina) {
         stamina = m_maxStamina;
@@ -128,13 +142,46 @@ void Player::draw() {
         source.x += m_playerTileX * PLAYER_TILE_WIDTH;
     }
     Rectangle dest = {(float)(xPos), (float)(yPos), (float)PLAYER_TILE_WIDTH, (float)PLAYER_TILE_HEIGHT};
-    Vector2 origin = {0,0};
+    Vector2 origin = {16,16};
     DrawTexturePro(m_playerTexture, source, dest, origin, 0.0f, WHITE);
+
+
+    // draw the players collider bounds
+    //Rectangle collider = m_getCollisionBounds(xPos, yPos);
+    //DrawRectangleLinesEx(collider, 1, RED);
 }
 
 void Player::destroy() {
     UnloadTexture(m_playerTexture);
 }
+
+bool Player::isColliding(const Rectangle& playerBounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+
+    // Get Tiles player is overlapping
+    int startX = playerBounds.x / TILE_WIDTH;
+    int endX = (playerBounds.x + playerBounds.width) / TILE_WIDTH;
+    int startY = playerBounds.y / TILE_HEIGHT;
+    int endY = (playerBounds.y + playerBounds.height) / TILE_HEIGHT;
+
+    for (int y = startY; y <= endY; y++) {
+        for (int x = startX; x <= endX; x++) {
+            // check if in bounds
+            if (y < 0 || y >= (int)worldCollisionLayer.size() ||
+                x < 0 || x >= (int)worldCollisionLayer.size()) {
+                continue; // Ignore tiles out of bounds
+            }
+
+            const Tilemap::sTile& tile = worldCollisionLayer[y][x];
+
+            if (tile.id != -1) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 
 void Player::m_setStartPos(int x, int y) {
     xPos = x * TILE_WIDTH;
@@ -145,4 +192,14 @@ void Player::m_loadPlayerTexture(const char* imgPath) {
     Image image = LoadImage(imgPath);
     m_playerTexture = LoadTextureFromImage(image);
     UnloadImage(image);
+}
+
+Rectangle Player::m_getCollisionBounds(float futureX, float futureY) const {
+    float colliderWidth = 4;
+    float colliderHeight = 4;
+
+    float offsetX = -2;
+    float offsetY = (colliderHeight) / 2.0f;
+
+    return {futureX + offsetX, futureY + offsetY, colliderWidth, colliderHeight};
 }

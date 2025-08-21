@@ -1,6 +1,7 @@
 #pragma once
 #include "../utils/project.h"
 #include "entity.h"
+#include "tilemap.h"
 #include <raylib.h>
 
 class Player : public Entity {
@@ -20,9 +21,11 @@ public:
     state currentState;
 
     void init();
-    void update(float deltaTime);
+    void update(float deltaTime,const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
     void draw();
     void destroy();
+
+    bool isColliding(const Rectangle& playerBounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
 private:
     Texture2D m_playerTexture;
     int m_playerTileX;
@@ -42,4 +45,5 @@ private:
 
     void m_setStartPos(int x, int y);
     void m_loadPlayerTexture(const char* imgPath);
+    Rectangle m_getCollisionBounds(float futureX, float futureY) const;
 };

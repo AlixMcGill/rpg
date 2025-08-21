@@ -5,6 +5,7 @@ void Game::init() {
     InitAudioDevice();
     m_tilemap.loadTexture("assets/Dungeon_Tileset-2.png");
     m_tilemap.loadCSV("assets/maps/rpgMainMap.csv");
+    m_tilemap.loadCSVCollisionLayer("assets/maps/rpgMainMapColl_coll.csv");
     m_tilemap.initCamera();
 
     player.init();
@@ -13,7 +14,7 @@ void Game::init() {
 
 void Game::update(float deltaTime) {
     std::cout << "Game class update" << std::endl;
-    player.update(deltaTime);
+    player.update(deltaTime, m_tilemap.worldCollisionLayer);
     m_tilemap.updateCameraTarget(player.xPos, player.yPos);
     m_tilemap.cameraZoom();
 }

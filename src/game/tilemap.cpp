@@ -15,6 +15,51 @@ void Tilemap::destroyTextures() {
     }
 }
 
+// Very important that collision map is loaded after regular map
+void Tilemap::loadCSVCollisionLayer(const std::string& filename) {
+    std::ifstream file(filename);
+    std::string line;
+    std::vector<int> tileIDs;
+
+    int width = 0;
+    int height = 0;
+
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string value;
+
+        int rowWidth = 0;
+
+        std::vector<int> row;
+        while (std::getline(ss, value, ',')) {
+            if (!value.empty()) {
+                row.push_back(std::stoi(value));
+                rowWidth++;
+            }
+
+        }
+
+        if (width == 0) width = rowWidth;
+        height++;
+        tileIDs.insert(tileIDs.end(), row.begin(), row.end());
+
+    }
+
+    if (mapWidth != width || mapHeight != height) {
+        std::cout << "[ERROR]: The collision map w and height are invalid" << std::endl;
+    }
+
+    worldCollisionLayer.resize(mapHeight, std::vector<sTile>(mapWidth));
+
+    for (int y = 0; y < mapHeight; y++) {
+        for (int x = 0; x < mapWidth; x++) {
+            int index = y * mapWidth + x;
+            worldCollisionLayer[y][x] = {x, y, tileIDs[index]};
+        }
+    }
+
+}
+
 void Tilemap::loadCSV(const std::string& filename) {
     std::ifstream file(filename);
     std::string line;
