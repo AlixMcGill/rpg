@@ -1,5 +1,6 @@
 #include "tilemap.h"
 #include <raylib.h>
+#include <string>
 
 void Tilemap::loadTexture(const char* imgPath) {
     std::cout << "Loading Texture" << std::endl;
@@ -14,30 +15,72 @@ void Tilemap::destroyTextures() {
     }
 }
 
-void Tilemap::initMap() {
-    for (int i = 0; i < WORLD_WIDTH; i++) {
-        for (int j = 0; j < WORLD_HEIGHT; j++) {
-            world[i][j] = (sTile) {
-                .x = i,
-                .y = j
-            };
+void Tilemap::loadCSV(const std::string& filename) {
+    std::ifstream file(filename);
+    std::string line;
+    std::vector<int> tileIDs;
+
+    int width = 0;
+    int height = 0;
+
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string value;
+
+        int rowWidth = 0;
+
+        std::vector<int> row;
+        while (std::getline(ss, value, ',')) {
+            if (!value.empty()) {
+                row.push_back(std::stoi(value));
+                rowWidth++;
+            }
+
+        }
+
+        if (width == 0) width = rowWidth;
+        height++;
+        tileIDs.insert(tileIDs.end(), row.begin(), row.end());
+
+    }
+
+    mapWidth = width;
+    mapHeight = height;
+
+    world.resize(mapHeight, std::vector<sTile>(mapWidth));
+
+    for (int y = 0; y < mapHeight; y++) {
+        for (int x = 0; x < mapWidth; x++) {
+            int index = y * mapWidth + x;
+            world[y][x] = {x, y, tileIDs[index]};
         }
     }
 }
 
 void Tilemap::renderMap() {
-    sTile tile;
+    float camLeft = camera.target.x - GetScreenWidth() * 0.5f / camera.zoom;
+    float camTop = camera.target.y - GetScreenHeight() * 0.5f / camera.zoom;
+    float camRight = camLeft + GetScreenWidth() / camera.zoom;
+    float camBottom = camTop + GetScreenWidth() / camera.zoom;
 
-    int texture_index_x = 0;
-    int texture_index_y = 0;
+    int startX = std::max(0, (int)(camLeft / TILE_HEIGHT));
+    int startY = std::max(0, (int)(camTop / TILE_HEIGHT));
+    int endX = std::min(mapWidth, (int)(camRight / TILE_WIDTH) + 1);
+    int endY = std::min(mapHeight, (int)(camBottom / TILE_HEIGHT) + 1);
 
-    for (int i = 0; i < WORLD_WIDTH; i++) {
-        for (int j = 0; j < WORLD_HEIGHT; j++) {
-            tile = world[i][j];
-            texture_index_x = i * TILE_WIDTH;
-            texture_index_y = j * TILE_HEIGHT;
+    for (int y = startY; y < endY; y++) {
+        for (int x = startX; x < endX; x++) {
 
-            Rectangle source = { (float)texture_index_x, (float)texture_index_y, (float)TILE_WIDTH, (float)TILE_HEIGHT};
+            sTile& tile = world[y][x];
+            if (tile.id == 0) continue;
+
+            int tilesPerRow = textures[TEXTURE_TILEMAP].width / TILE_WIDTH;
+            int tileIndex = tile.id;
+
+            int srcX = (tileIndex % tilesPerRow) * TILE_WIDTH;
+            int srcY = (tileIndex / tilesPerRow) * TILE_HEIGHT;
+
+            Rectangle source = { (float)srcX, (float)srcY, (float)TILE_WIDTH, (float)TILE_HEIGHT};
             Rectangle dest = {(float)(tile.x * TILE_WIDTH), (float)(tile.y * TILE_HEIGHT), (float)TILE_WIDTH, (float)TILE_HEIGHT};
             Vector2 origin = {0,0};
             DrawTexturePro(textures[TEXTURE_TILEMAP], source, dest, origin, 0.0f, WHITE);
@@ -59,7 +102,7 @@ void Tilemap::cameraZoom() {
         const float zoomIncrement = 0.125f;
         camera.zoom += (wheel * zoomIncrement);
 
-        if (camera.zoom < 0.25f) camera.zoom = 0.25f;
+        if (camera.zoom < 2.5f) camera.zoom = 2.5f;
         if (camera.zoom > 4.0f) camera.zoom = 4.0f;
     }
 

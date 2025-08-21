@@ -3,8 +3,8 @@
 void Game::init() {
     std::cout << "Game class init" << std::endl;
     InitAudioDevice();
-    m_tilemap.loadTexture("assets/Dungeon_Tileset.png");
-    m_tilemap.initMap();
+    m_tilemap.loadTexture("assets/Dungeon_Tileset-2.png");
+    m_tilemap.loadCSV("assets/maps/rpgMainMap.csv");
     m_tilemap.initCamera();
 
     player.init();

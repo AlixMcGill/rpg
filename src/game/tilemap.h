@@ -9,15 +9,18 @@ public:
     struct sTile {
         int x;
         int y;
+        int id;
     };
     Texture2D textures[MAX_TEXTURES];
-    sTile world[WORLD_WIDTH][WORLD_HEIGHT];
+    std::vector<std::vector<sTile>> world;
+    int mapWidth = 0;
+    int mapHeight = 0;
     Camera2D camera;
     Vector2 cameraTarget;
 
     void loadTexture(const char* imgPath);
     void destroyTextures();
-    void initMap();
+    void loadCSV(const std::string& filename);
     void renderMap();
     void initCamera();
     void cameraZoom();
