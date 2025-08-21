@@ -4,8 +4,9 @@ void Game::init() {
     std::cout << "Game class init" << std::endl;
     InitAudioDevice();
     m_tilemap.loadTexture("assets/Dungeon_Tileset-2.png");
-    m_tilemap.loadCSV("assets/maps/rpgMainMap.csv");
-    m_tilemap.loadCSVCollisionLayer("assets/maps/rpgMainMapColl_coll.csv");
+    m_tilemap.loadCSV("assets/maps/rpgMainMap_Tile Layer 1.csv");
+    m_tilemap.loadCSVAssetLayer("assets/maps/rpgMainMap_assets.csv");
+    m_tilemap.loadCSVCollisionLayer("assets/maps/rpgMainMap_coll.csv");
     m_tilemap.initCamera();
 
     player.init();

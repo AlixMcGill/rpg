@@ -60,7 +60,7 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
     // handle running
     if (IsKeyDown(KEY_RIGHT_SHIFT) || IsKeyDown(KEY_LEFT_SHIFT) && stamina > 1.0f) {
         if (stamina > 0.0f) {
-            stamina -= 0.1f;
+            stamina -= 0.06f;
         }
         m_speed = m_runSpeed;
         m_frameTime = 0.05f;

@@ -14,6 +14,7 @@ public:
     Texture2D textures[MAX_TEXTURES];
     std::vector<std::vector<sTile>> world;
     std::vector<std::vector<sTile>> worldCollisionLayer;
+    std::vector<std::vector<sTile>> worldAssetLayer;
     int mapWidth = 0;
     int mapHeight = 0;
     Camera2D camera;
@@ -22,6 +23,7 @@ public:
     void loadTexture(const char* imgPath);
     void destroyTextures();
     void loadCSV(const std::string& filename);
+    void loadCSVAssetLayer(const std::string& filename);
     void loadCSVCollisionLayer(const std::string& filename);
     void renderMap();
     void initCamera();
@@ -31,5 +33,7 @@ private:
     enum m_textrueAsset {
         TEXTURE_TILEMAP = 0
     };
+
+    void m_loadCSV(const std::string& filename, std::vector<std::vector<sTile>>& loadPath);
 
 };

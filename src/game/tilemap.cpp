@@ -9,55 +9,18 @@ void Tilemap::loadTexture(const char* imgPath) {
     UnloadImage(image);
 }
 
-void Tilemap::destroyTextures() {
-    for (int i = 0; i < MAX_TEXTURES; i++) {
+void Tilemap::destroyTextures() { for (int i = 0; i < MAX_TEXTURES; i++) {
         UnloadTexture(textures[i]);
     }
 }
 
 // Very important that collision map is loaded after regular map
 void Tilemap::loadCSVCollisionLayer(const std::string& filename) {
-    std::ifstream file(filename);
-    std::string line;
-    std::vector<int> tileIDs;
+    m_loadCSV(filename, worldCollisionLayer);
+}
 
-    int width = 0;
-    int height = 0;
-
-    while (std::getline(file, line)) {
-        std::stringstream ss(line);
-        std::string value;
-
-        int rowWidth = 0;
-
-        std::vector<int> row;
-        while (std::getline(ss, value, ',')) {
-            if (!value.empty()) {
-                row.push_back(std::stoi(value));
-                rowWidth++;
-            }
-
-        }
-
-        if (width == 0) width = rowWidth;
-        height++;
-        tileIDs.insert(tileIDs.end(), row.begin(), row.end());
-
-    }
-
-    if (mapWidth != width || mapHeight != height) {
-        std::cout << "[ERROR]: The collision map w and height are invalid" << std::endl;
-    }
-
-    worldCollisionLayer.resize(mapHeight, std::vector<sTile>(mapWidth));
-
-    for (int y = 0; y < mapHeight; y++) {
-        for (int x = 0; x < mapWidth; x++) {
-            int index = y * mapWidth + x;
-            worldCollisionLayer[y][x] = {x, y, tileIDs[index]};
-        }
-    }
-
+void Tilemap::loadCSVAssetLayer(const std::string& filename) {
+    m_loadCSV(filename, worldAssetLayer);
 }
 
 void Tilemap::loadCSV(const std::string& filename) {
@@ -113,10 +76,29 @@ void Tilemap::renderMap() {
     int endX = std::min(mapWidth, (int)(camRight / TILE_WIDTH) + 1);
     int endY = std::min(mapHeight, (int)(camBottom / TILE_HEIGHT) + 1);
 
-    for (int y = startY; y < endY; y++) {
+    for (int y = startY; y < endY; y++) { // Main Layer
         for (int x = startX; x < endX; x++) {
 
             sTile& tile = world[y][x];
+            if (tile.id == 0) continue;
+
+            int tilesPerRow = textures[TEXTURE_TILEMAP].width / TILE_WIDTH;
+            int tileIndex = tile.id;
+
+            int srcX = (tileIndex % tilesPerRow) * TILE_WIDTH;
+            int srcY = (tileIndex / tilesPerRow) * TILE_HEIGHT;
+
+            Rectangle source = { (float)srcX, (float)srcY, (float)TILE_WIDTH, (float)TILE_HEIGHT};
+            Rectangle dest = {(float)(tile.x * TILE_WIDTH), (float)(tile.y * TILE_HEIGHT), (float)TILE_WIDTH, (float)TILE_HEIGHT};
+            Vector2 origin = {0,0};
+            DrawTexturePro(textures[TEXTURE_TILEMAP], source, dest, origin, 0.0f, WHITE);
+        }
+    }
+
+    for (int y = startY; y < endY; y++) { // Asset layer for below player
+        for (int x = startX; x < endX; x++) {
+
+            sTile& tile = worldAssetLayer[y][x];
             if (tile.id == 0) continue;
 
             int tilesPerRow = textures[TEXTURE_TILEMAP].width / TILE_WIDTH;
@@ -158,4 +140,47 @@ void Tilemap::updateCameraTarget(float x, float y) {
     camera.target = (Vector2){ x, y };
     cameraTarget.x = x;
     cameraTarget.y = y;
+}
+
+void Tilemap::m_loadCSV(const std::string& filename, std::vector<std::vector<sTile>>& loadPath) {
+    std::ifstream file(filename);
+    std::string line;
+    std::vector<int> tileIDs;
+
+    int width = 0;
+    int height = 0;
+
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string value;
+
+        int rowWidth = 0;
+
+        std::vector<int> row;
+        while (std::getline(ss, value, ',')) {
+            if (!value.empty()) {
+                row.push_back(std::stoi(value));
+                rowWidth++;
+            }
+
+        }
+
+        if (width == 0) width = rowWidth;
+        height++;
+        tileIDs.insert(tileIDs.end(), row.begin(), row.end());
+
+    }
+
+    if (mapWidth != width || mapHeight != height) {
+        std::cout << "[ERROR]: The collision map w and height are invalid" << std::endl;
+    }
+
+    loadPath.resize(mapHeight, std::vector<sTile>(mapWidth));
+
+    for (int y = 0; y < mapHeight; y++) {
+        for (int x = 0; x < mapWidth; x++) {
+            int index = y * mapWidth + x;
+            loadPath[y][x] = {x, y, tileIDs[index]};
+        }
+    }
 }
