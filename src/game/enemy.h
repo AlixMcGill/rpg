@@ -41,14 +41,14 @@ private:
     float m_defaultFrameTime = 0.12f;
 
     float m_pathfindTimer = 0.0f;
-    float m_pathfindTime = 0.5f;
+    float m_pathfindTime = 0.4f;
     float m_attackPathfindTime = 0.1f;
-    float m_defaultPathfindTime = 0.5f;
+    float m_defaultPathfindTime = 0.4f;
 
     float m_speed = 1.0f;
 
-    float m_playerDistance = 500.0f;
-    float m_attackRange = 8.0f;
+    float m_playerDistance = 100.0f;
+    float m_attackRange = 25.0f;
 
     void m_setStartPos(int x, int y);
     state m_randomMoveState();

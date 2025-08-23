@@ -52,6 +52,16 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
 
             std::string whereIsPlayer = m_whereIsPlayer(playerXPos, playerYPos);
 
+            if (whereIsPlayer == "UP") {
+                currentState = ATTACK_UP;
+            } else if (whereIsPlayer == "DOWN") {
+                currentState = ATTACK_DOWN;
+            } else if (whereIsPlayer == "LEFT") {
+                currentState = ATTACK_LEFT;
+            } else if (whereIsPlayer == "RIGHT") {
+                currentState = ATTACK_RIGHT;
+            }
+
         } else {
             std::cout << "Move" << std::endl;
             // enemy will randomly walk around if the player is not near
@@ -64,31 +74,151 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
     switch (currentState) {
         case IDLE_UP:
             currentState = IDLE_UP;
+            if (m_frameTimer >= m_frameTime) {
+                m_enemyTileY = 2;
+                m_enemyTileX++;
+
+                if (m_enemyTileX > 5) {
+                    m_enemyTileX = 0;
+                }
+                m_frameTimer = 0.0f;
+            }
             break;
         case IDLE_DOWN:
             currentState = IDLE_DOWN;
+            if (m_frameTimer >= m_frameTime) {
+                m_enemyTileY = 0;
+                m_enemyTileX++;
+
+                if (m_enemyTileX > 5) {
+                    m_enemyTileX = 0;
+                }
+                m_frameTimer = 0.0f;
+            }
             break;
         case IDLE_LEFT:
             currentState = IDLE_LEFT;
+            if (m_frameTimer >= m_frameTime) {
+                m_enemyTileY = 1;
+                m_enemyTileX++;
+
+                if (m_enemyTileX > 5) {
+                    m_enemyTileX = 0;
+                }
+                m_frameTimer = 0.0f;
+            }
             break;
         case IDLE_RIGHT:
             currentState = IDLE_RIGHT;
+            if (m_frameTimer >= m_frameTime) {
+                m_enemyTileY = 1;
+                m_enemyTileX++;
+
+                if (m_enemyTileX > 5) {
+                    m_enemyTileX = 0;
+                }
+                m_frameTimer = 0.0f;
+            }
             break;
         case WALK_UP:
             currentState = WALK_UP;
             yPos += -m_moveSpeed;
+            if (m_frameTimer >= m_frameTime) {
+                m_enemyTileY = 2;
+                m_enemyTileX++;
+
+                if (m_enemyTileX > 5) {
+                    m_enemyTileX = 0;
+                }
+                m_frameTimer = 0.0f;
+            }
             break;
         case WALK_DOWN:
             currentState = WALK_DOWN;
             yPos += m_moveSpeed;
+            if (m_frameTimer >= m_frameTime) {
+                m_enemyTileY = 3;
+                m_enemyTileX++;
+
+                if (m_enemyTileX > 5) {
+                    m_enemyTileX = 0;
+                }
+                m_frameTimer = 0.0f;
+            }
             break;
         case WALK_LEFT:
             currentState = WALK_LEFT;
             xPos += -m_moveSpeed;
+            if (m_frameTimer >= m_frameTime) {
+                m_enemyTileY = 4;
+                m_enemyTileX++;
+
+                if (m_enemyTileX > 5) {
+                    m_enemyTileX = 0;
+                }
+                m_frameTimer = 0.0f;
+            }
             break;
         case WALK_RIGHT:
             currentState = WALK_RIGHT;
             xPos += +m_moveSpeed;
+            if (m_frameTimer >= m_frameTime) {
+                m_enemyTileY = 4;
+                m_enemyTileX++;
+
+                if (m_enemyTileX > 5) {
+                    m_enemyTileX = 0;
+                }
+                m_frameTimer = 0.0f;
+            }
+            break;
+        case ATTACK_UP:
+            yPos += 0.0f;
+            if (m_frameTimer >= m_frameTime) {
+                m_enemyTileY = 9;
+                m_enemyTileX++;
+
+                if (m_enemyTileX > 3) {
+                    m_enemyTileX = 0;
+                }
+                m_frameTimer = 0.0f;
+            }
+            break;
+        case ATTACK_DOWN:
+            yPos += 0.0f;
+            if (m_frameTimer >= m_frameTime) {
+                m_enemyTileY = 7;
+                m_enemyTileX++;
+
+                if (m_enemyTileX > 3) {
+                    m_enemyTileX = 0;
+                }
+                m_frameTimer = 0.0f;
+            }
+            break;
+        case ATTACK_LEFT:
+            xPos += 0.0f;
+            if (m_frameTimer >= m_frameTime) {
+                m_enemyTileY = 8;
+                m_enemyTileX++;
+
+                if (m_enemyTileX > 3) {
+                    m_enemyTileX = 0;
+                }
+                m_frameTimer = 0.0f;
+            }
+            break;
+        case ATTACK_RIGHT:
+            xPos += 0.0f;
+            if (m_frameTimer >= m_frameTime) {
+                m_enemyTileY = 8;
+                m_enemyTileX++;
+
+                if (m_enemyTileX > 3) {
+                    m_enemyTileX = 0;
+                }
+                m_frameTimer = 0.0f;
+            }
             break;
         default:
             break;
