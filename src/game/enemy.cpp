@@ -262,7 +262,6 @@ void Enemy::m_loadEnemyTexture(const char* imgPath) {
 }
 
 Enemy::state Enemy::m_randomMoveState() {
-    std::srand(static_cast<unsigned>(std::time(nullptr)));
 
     std::vector<Enemy::state> validStates = {
         IDLE_UP, IDLE_DOWN, IDLE_LEFT, IDLE_RIGHT,

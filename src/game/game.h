@@ -18,5 +18,5 @@ private:
     DevStats dev;
     Player player;
     EnemyController m_enemyController;
-    Enemy skely;
+    //Enemy skely;
 };
