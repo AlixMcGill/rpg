@@ -1,4 +1,5 @@
 #include "game.h"
+#include "tilemap.h"
 
 void Game::init() {
     std::cout << "Game class init" << std::endl;
@@ -11,6 +12,9 @@ void Game::init() {
 
     player.init();
     m_tilemap.updateCameraTarget(player.xPos, player.yPos);
+
+    //m_enemyController.init("Overworld_Map");
+    skely.init(20, 10, "assets/enemy/Skeleton.png");
 }
 
 void Game::update(float deltaTime) {
@@ -18,6 +22,8 @@ void Game::update(float deltaTime) {
     player.update(deltaTime, m_tilemap.worldCollisionLayer);
     m_tilemap.updateCameraTarget(player.xPos, player.yPos);
     m_tilemap.cameraZoom();
+    //m_enemyController.update(deltaTime, player.xPos, player.yPos, m_tilemap.worldCollisionLayer);
+    skely.update(deltaTime, player.xPos, player.yPos, m_tilemap.worldCollisionLayer);
 }
 
 void Game::draw() {
@@ -25,7 +31,8 @@ void Game::draw() {
     BeginMode2D(m_tilemap.camera);
     m_tilemap.renderMap();
     player.draw();
-
+    //m_enemyController.draw();
+    skely.draw();
     EndMode2D();
 
     dev.devstats(m_tilemap.camera, player);
@@ -36,4 +43,6 @@ void Game::destroy() {
     CloseAudioDevice();
     m_tilemap.destroyTextures();
     player.destroy();
+    //m_enemyController.destroy();
+    skely.destroy();
 }
