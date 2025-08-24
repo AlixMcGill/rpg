@@ -217,8 +217,8 @@ void Player::draw() {
 
 
     // draw the players collider bounds
-    //Rectangle collider = m_getCollisionBounds(xPos, yPos);
-    //DrawRectangleLinesEx(collider, 1, RED);
+    Rectangle collider = m_getCollisionBounds(xPos, yPos);
+    DrawRectangleLinesEx(collider, 1, RED);
 }
 
 void Player::destroy() {
@@ -268,11 +268,12 @@ Rectangle Player::m_getCollisionBounds(float futureX, float futureY) const {
     float colliderWidth = 4;
     float colliderHeight = 4;
 
-    float offsetX = -2;
+    float offsetX = -(colliderWidth / 2.0f);
     float offsetY = (colliderHeight) / 2.0f;
 
     return {futureX + offsetX, futureY + offsetY, colliderWidth, colliderHeight};
 }
+
 std::string Player::m_getMouseDirection() {
     Vector2 screenMid = {(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2};
     Vector2 mousePos = GetMousePosition();

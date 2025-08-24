@@ -34,7 +34,8 @@ private:
     int m_enemyTileX;
     int m_enemyTileY;
 
-    float m_moveSpeed = 1.0f;
+    Rectangle m_collisionRect;
+    Vector2 m_collisionOffset;
 
     float m_frameTimer = 0.0f;
     float m_frameTime = 0.12f;
@@ -45,7 +46,8 @@ private:
     float m_attackPathfindTime = 0.1f;
     float m_defaultPathfindTime = 0.4f;
 
-    float m_speed = 1.0f;
+    float m_speed = 80.0f; // Max move speed
+    float m_moveSpeed = 50.0f;
 
     float m_playerDistance = 100.0f;
     float m_attackRange = 25.0f;
@@ -56,4 +58,7 @@ private:
     bool m_isPlayerNear(float& playerXPos, float& playerYPos);
     bool m_isInAttackRange(float& playerXPos, float& playerYPos);
     std::string m_whereIsPlayer(float& playerXPos, float& playerYPos);
+    void m_setBoxCollider(float width, float height, float offsetX, float offsetY);
+    Rectangle m_getCollisionBounds(float futureX, float futureY) const;
+    bool isColliding(const Rectangle& bounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
 };

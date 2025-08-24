@@ -8,11 +8,15 @@ Enemy::Enemy(int startX, int startY, Texture& textrue)
     m_enemyTileX = 0;
     m_enemyTileY = 0;
     currentState = IDLE_DOWN;
+    m_setBoxCollider(4.0f, 4.0f, -2.0f, 2.0f);
 }
 
 void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer ) {
     m_frameTimer += deltaTime;
     m_pathfindTimer += deltaTime;
+
+    float moveX = 0.0f;
+    float moveY = 0.0f;
 
     if (m_pathfindTimer >= m_pathfindTime) {
         if (m_isPlayerNear(playerXPos, playerYPos) && !m_isInAttackRange(playerXPos, playerYPos)) { 
@@ -117,7 +121,7 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
             break;
         case WALK_UP:
             currentState = WALK_UP;
-            yPos += -m_moveSpeed;
+            moveY += -m_moveSpeed * deltaTime;
             if (m_frameTimer >= m_frameTime) {
                 m_enemyTileY = 2;
                 m_enemyTileX++;
@@ -130,7 +134,7 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
             break;
         case WALK_DOWN:
             currentState = WALK_DOWN;
-            yPos += m_moveSpeed;
+            moveY += m_moveSpeed * deltaTime;
             if (m_frameTimer >= m_frameTime) {
                 m_enemyTileY = 3;
                 m_enemyTileX++;
@@ -143,7 +147,7 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
             break;
         case WALK_LEFT:
             currentState = WALK_LEFT;
-            xPos += -m_moveSpeed;
+            moveX += -m_moveSpeed * deltaTime;
             if (m_frameTimer >= m_frameTime) {
                 m_enemyTileY = 4;
                 m_enemyTileX++;
@@ -156,7 +160,7 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
             break;
         case WALK_RIGHT:
             currentState = WALK_RIGHT;
-            xPos += +m_moveSpeed;
+            moveX += m_moveSpeed * deltaTime;
             if (m_frameTimer >= m_frameTime) {
                 m_enemyTileY = 4;
                 m_enemyTileX++;
@@ -168,7 +172,6 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
             }
             break;
         case ATTACK_UP:
-            yPos += 0.0f;
             if (m_frameTimer >= m_frameTime) {
                 m_enemyTileY = 9;
                 m_enemyTileX++;
@@ -180,7 +183,6 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
             }
             break;
         case ATTACK_DOWN:
-            yPos += 0.0f;
             if (m_frameTimer >= m_frameTime) {
                 m_enemyTileY = 7;
                 m_enemyTileX++;
@@ -192,7 +194,6 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
             }
             break;
         case ATTACK_LEFT:
-            xPos += 0.0f;
             if (m_frameTimer >= m_frameTime) {
                 m_enemyTileY = 8;
                 m_enemyTileX++;
@@ -204,7 +205,6 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
             }
             break;
         case ATTACK_RIGHT:
-            xPos += 0.0f;
             if (m_frameTimer >= m_frameTime) {
                 m_enemyTileY = 8;
                 m_enemyTileX++;
@@ -217,6 +217,19 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
             break;
         default:
             break;
+    }
+
+    // update enemy position
+    // also handles collision
+    
+    Rectangle futureX = m_getCollisionBounds(xPos + moveX, yPos);
+    if (!isColliding(futureX, collisionLayer)) { 
+        xPos += moveX;
+    }
+
+    Rectangle futureY = m_getCollisionBounds(xPos, yPos + moveY);
+    if (!isColliding(futureY, collisionLayer)) {
+        yPos += moveY;
     }
 }
 
@@ -281,4 +294,42 @@ std::string Enemy::m_whereIsPlayer(float& playerXPos, float& playerYPos) {
     } else {
         return (playerYPos > yPos) ? "DOWN" : "UP";
     }
+}
+
+void Enemy::m_setBoxCollider(float width, float height, float offsetX, float offsetY) {
+    m_collisionRect.width = width;
+    m_collisionRect.height = height;
+    m_collisionOffset.x = offsetX;
+    m_collisionOffset.y = offsetY;
+}
+
+Rectangle Enemy::m_getCollisionBounds(float futureX, float futureY) const {
+    return {futureX + m_collisionOffset.x, futureY + m_collisionOffset.y, m_collisionRect.width, m_collisionRect.height};
+}
+
+bool Enemy::isColliding(const Rectangle& bounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+
+    // Get Tiles player is overlapping
+    int startX = bounds.x / TILE_WIDTH;
+    int endX = (bounds.x + bounds.width) / TILE_WIDTH;
+    int startY = bounds.y / TILE_HEIGHT;
+    int endY = (bounds.y + bounds.height) / TILE_HEIGHT;
+
+    for (int y = startY; y <= endY; y++) {
+        for (int x = startX; x <= endX; x++) {
+            // check if in bounds
+            if (y < 0 || y >= (int)worldCollisionLayer.size() ||
+                x < 0 || x >= (int)worldCollisionLayer.size()) {
+                continue; // Ignore tiles out of bounds
+            }
+
+            const Tilemap::sTile& tile = worldCollisionLayer[y][x];
+
+            if (tile.id != -1) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
