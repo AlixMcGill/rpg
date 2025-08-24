@@ -3,6 +3,7 @@
 #include "tilemap.h"
 #include "../utils/math.h"
 #include "../utils/project.h"
+#include <raylib.h>
 
 class Enemy : public Entity {
 public:
@@ -24,13 +25,12 @@ public:
 
     state currentState;
 
-    void init(int startX, int startY, const char* spriteSheet);
+    Enemy(int startX, int startY, Texture& textrue);
     void update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer);
     void draw();
-    void destroy();
 private:
-    const char* m_spriteSheet;
-    Texture2D m_enemyTexture;
+
+    Texture2D& m_enemyTexture;
     int m_enemyTileX;
     int m_enemyTileY;
 
@@ -56,5 +56,4 @@ private:
     bool m_isPlayerNear(float& playerXPos, float& playerYPos);
     bool m_isInAttackRange(float& playerXPos, float& playerYPos);
     std::string m_whereIsPlayer(float& playerXPos, float& playerYPos);
-    void m_loadEnemyTexture(const char* imgPath);
 };

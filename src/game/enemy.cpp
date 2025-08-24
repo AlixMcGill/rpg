@@ -2,13 +2,12 @@
 #include <cstdlib>
 #include <raylib.h>
 
-void Enemy::init(int startX, int startY, const char* spriteSheet) {
+Enemy::Enemy(int startX, int startY, Texture& textrue)
+        : m_enemyTexture(textrue) {
     m_setStartPos(startX, startY);
-    m_spriteSheet = spriteSheet;
-    m_loadEnemyTexture(m_spriteSheet);
-
     m_enemyTileX = 0;
     m_enemyTileY = 0;
+    currentState = IDLE_DOWN;
 }
 
 void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer ) {
@@ -16,9 +15,7 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
     m_pathfindTimer += deltaTime;
 
     if (m_pathfindTimer >= m_pathfindTime) {
-        std::cout << "Check" << std::endl;
         if (m_isPlayerNear(playerXPos, playerYPos) && !m_isInAttackRange(playerXPos, playerYPos)) { 
-            std::cout << "Near" << std::endl;
             // enemy will pathfind towards the player when near
             m_pathfindTime = m_defaultPathfindTime;
             m_pathfindTimer = 0.0f;
@@ -45,7 +42,6 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
             }
 
         } else if (m_isInAttackRange(playerXPos, playerYPos)) {
-            std::cout << "Attack" << std::endl;
             // enemy will attack the player if near
             m_pathfindTime = m_attackPathfindTime;
             m_pathfindTimer = 0.0f;
@@ -63,7 +59,6 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
             }
 
         } else {
-            std::cout << "Move" << std::endl;
             // enemy will randomly walk around if the player is not near
             m_pathfindTime = m_defaultPathfindTime;
             m_pathfindTimer = 0.0f;
@@ -245,20 +240,9 @@ void Enemy::draw() {
     //DrawRectangleLinesEx(collider, 1, RED);
 }
 
-void Enemy::destroy() {
-    UnloadTexture(m_enemyTexture);
-}
-
-
 void Enemy::m_setStartPos(int x, int y) {
     xPos = x * TILE_WIDTH;
     yPos = y * TILE_HEIGHT;
-}
-
-void Enemy::m_loadEnemyTexture(const char* imgPath) {
-    Image image = LoadImage(imgPath);
-    m_enemyTexture = LoadTextureFromImage(image);
-    UnloadImage(image);
 }
 
 Enemy::state Enemy::m_randomMoveState() {

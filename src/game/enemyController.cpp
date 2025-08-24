@@ -1,22 +1,18 @@
 #include "enemyController.h"
+#include <raylib.h>
 
 void EnemyController::init(std::string map) {
     if (map == "Overworld_Map") {
-        Enemy skel1;
-        skel1.init(10, 10, "assets/enemy/Skeleton.png");
-        enemys.push_back(skel1);
-        Enemy skel2;
-        skel2.init(10, 12, "assets/enemy/Skeleton.png");
-        enemys.push_back(skel2);
-        Enemy skel3;
-        skel3.init(8, 12, "assets/enemy/Skeleton.png");
-        enemys.push_back(skel3);
-        Enemy skel4;
-        skel4.init(8, 12, "assets/enemy/Skeleton.png");
-        enemys.push_back(skel4);
-        Enemy skel5;
-        skel5.init(8, 12, "assets/enemy/Skeleton.png");
-        enemys.push_back(skel5);
+        enemys.clear();
+
+        // init the textures to be used in level
+        textures["Skeleton"] = m_loadTexture("assets/enemy/Skeleton.png");
+
+        enemys.emplace_back(10, 10, textures["Skeleton"]);
+        enemys.emplace_back(10, 12, textures["Skeleton"]);
+        enemys.emplace_back(8, 12, textures["Skeleton"]);
+        enemys.emplace_back(8, 12, textures["Skeleton"]);
+        enemys.emplace_back(8, 12, textures["Skeleton"]);
     }
 }
 void EnemyController::update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer) {
@@ -40,8 +36,8 @@ void EnemyController::drawFrontPlayer() {
 }
 
 void EnemyController::destroy() {
-    for (auto& e : enemys) {
-        e.destroy();
+    for (auto& [name, texts] : textures) {
+        UnloadTexture(texts);
     }
 }
 
@@ -58,4 +54,15 @@ void EnemyController::m_sortDrawOrder(float& playerYPos) {
             frontPlayerEnemys.push_back(e);
         }
     }
+}
+
+Texture EnemyController::m_loadTexture(const char* path) {
+    Image image = LoadImage(path);
+    Texture text = LoadTextureFromImage(image);
+    UnloadImage(image);
+    return text;
+}
+
+void EnemyController::m_cleanEnemys() {
+    enemys.clear();
 }
