@@ -26,9 +26,9 @@ public:
     state currentState;
 
     Enemy(int startX, int startY, Texture& textrue);
-    void update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer);
+    virtual void update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer);
     void draw();
-private:
+    void setBoxCollider(float width, float height, float offsetX, float offsetY);
 
     Texture2D& m_enemyTexture;
     int m_enemyTileX;
@@ -58,7 +58,15 @@ private:
     bool m_isPlayerNear(float& playerXPos, float& playerYPos);
     bool m_isInAttackRange(float& playerXPos, float& playerYPos);
     std::string m_whereIsPlayer(float& playerXPos, float& playerYPos);
-    void m_setBoxCollider(float width, float height, float offsetX, float offsetY);
     Rectangle m_getCollisionBounds(float futureX, float futureY) const;
     bool isColliding(const Rectangle& bounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
+
+    void updateAndCollide(float& moveX, float& moveY, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
+
+    // tells the renderer what tiles to render on the sprite sheet
+    void animate(float startY, float endX);
+
+protected:
+    virtual void m_stateHandling(float& playerXPos, float& playerYPos);
+    virtual void m_stateCheck(float& deltaTime, float& moveY, float& moveX);
 };

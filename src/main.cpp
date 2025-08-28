@@ -4,7 +4,7 @@
 
 int main() {
     InitWindow(windowWidth, windowHeight, "RPG Game");
-    SetTargetFPS(60);
+    SetTargetFPS(240);
 
     Game game;
 

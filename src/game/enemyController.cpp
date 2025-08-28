@@ -1,23 +1,20 @@
 #include "enemyController.h"
+#include <memory>
 #include <raylib.h>
 
 void EnemyController::init(std::string map) {
     if (map == "Overworld_Map") {
-        enemys.clear();
+        enemies.clear();
 
         // init the textures to be used in level
         textures["Skeleton"] = m_loadTexture("assets/enemy/Skeleton.png");
 
-        enemys.emplace_back(10, 10, textures["Skeleton"]);
-        enemys.emplace_back(10, 12, textures["Skeleton"]);
-        enemys.emplace_back(8, 12, textures["Skeleton"]);
-        enemys.emplace_back(8, 12, textures["Skeleton"]);
-        enemys.emplace_back(8, 12, textures["Skeleton"]);
+        m_spawnSkeleton(10, 10, textures["Skeleton"]);
     }
 }
 void EnemyController::update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer) {
-    for (auto& e : enemys) {
-        e.update(deltaTime, playerXPos, playerYPos, collisionLayer);
+    for (auto& e : enemies) {
+        e->update(deltaTime, playerXPos, playerYPos, collisionLayer);
     }
 
     m_sortDrawOrder(playerYPos);
@@ -25,13 +22,13 @@ void EnemyController::update(float deltaTime, float& playerXPos, float& playerYP
 
 void EnemyController::drawBehindPlayer() {
     for (auto& e : behindPlayerEnemys) {
-            e.draw();
+            e->draw();
     }
 }
 
 void EnemyController::drawFrontPlayer() {
     for (auto& e : frontPlayerEnemys) {
-            e.draw();
+            e->draw();
     }
 }
 
@@ -47,11 +44,11 @@ void EnemyController::m_sortDrawOrder(float& playerYPos) {
     behindPlayerEnemys.clear();
     frontPlayerEnemys.clear();
 
-    for (auto& e : enemys) {
-        if (e.yPos + 16 < centerPlayerY) {
-            behindPlayerEnemys.push_back(e);
+    for (auto& e : enemies) {
+        if (e->yPos + 16 < centerPlayerY) {
+            behindPlayerEnemys.push_back(e.get());
         } else {
-            frontPlayerEnemys.push_back(e);
+            frontPlayerEnemys.push_back(e.get());
         }
     }
 }
@@ -64,5 +61,10 @@ Texture EnemyController::m_loadTexture(const char* path) {
 }
 
 void EnemyController::m_cleanEnemys() {
-    enemys.clear();
+    enemies.clear();
+}
+
+// Enemy Spawing Methods
+void EnemyController::m_spawnSkeleton(int x, int y, Texture& texture) {
+    enemies.push_back(std::make_unique<Skeleton>(x, y, texture));
 }
