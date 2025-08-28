@@ -57,6 +57,7 @@ public:
     void m_moveTowardsPlayer(float& playerXPos, float& playerYPos);
     bool m_isPlayerNear(float& playerXPos, float& playerYPos);
     bool m_isInAttackRange(float& playerXPos, float& playerYPos);
+    bool canSeePlayer(float& playerXPos, float& playerYPos, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
     std::string m_whereIsPlayer(float& playerXPos, float& playerYPos);
     Rectangle m_getCollisionBounds(float futureX, float futureY) const;
     bool isColliding(const Rectangle& bounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
@@ -65,8 +66,7 @@ public:
 
     // tells the renderer what tiles to render on the sprite sheet
     void animate(float startY, float endX);
-
 protected:
-    virtual void m_stateHandling(float& playerXPos, float& playerYPos);
+    virtual void m_stateHandling(float& playerXPos, float& playerYPos, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
     virtual void m_stateCheck(float& deltaTime, float& moveY, float& moveX);
 };

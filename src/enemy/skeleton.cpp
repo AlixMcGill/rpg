@@ -12,14 +12,15 @@ void Skeleton::update(float deltaTime, float& playerXPos, float& playerYPos, std
     float moveX = 0.0f;
     float moveY = 0.0f;
 
-    m_stateHandling(playerXPos, playerYPos);
+    m_stateHandling(playerXPos, playerYPos, collisionLayer);
     m_stateCheck(deltaTime, moveY, moveX);
     updateAndCollide(moveX, moveY, collisionLayer);
 }
 
-void Skeleton::m_stateHandling(float& playerXPos, float& playerYPos) {
+void Skeleton::m_stateHandling(float& playerXPos, float& playerYPos, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
     if (m_pathfindTimer >= m_pathfindTime) {
-        if (m_isPlayerNear(playerXPos, playerYPos) && !m_isInAttackRange(playerXPos, playerYPos)) { 
+        if (m_isPlayerNear(playerXPos, playerYPos) && !m_isInAttackRange(playerXPos, playerYPos) &&
+            canSeePlayer(playerXPos, playerYPos, worldCollisionLayer)) { 
             // enemy will pathfind towards the player when near
             m_pathfindTime = m_defaultPathfindTime;
             m_pathfindTimer = 0.0f;

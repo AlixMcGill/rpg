@@ -18,7 +18,7 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
     float moveX = 0.0f;
     float moveY = 0.0f;
 
-    m_stateHandling(playerXPos, playerYPos);
+    m_stateHandling(playerXPos, playerYPos, collisionLayer);
     m_stateCheck(deltaTime, moveY, moveX);
     updateAndCollide(moveX, moveY, collisionLayer);
 }
@@ -76,6 +76,40 @@ bool Enemy::m_isInAttackRange(float& playerXPos, float& playerYPos) {
         return false;
     }
 
+}
+
+bool Enemy::canSeePlayer(float& playerXPos, float& playerYPos, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+
+    // start and end position for ray
+    float startX = xPos + m_collisionRect.width / 2;
+    float startY = yPos + m_collisionRect.height / 2;
+
+    float dx = playerXPos - startX;
+    float dy = playerYPos - startY;
+
+    float distanceToPlayer = distance(startX, startY, playerXPos, playerYPos);
+
+    int steps = (int)(distanceToPlayer / TILE_WIDTH);
+
+    float stepX = dx / steps;
+    float stepY = dy / steps;
+
+    for (int i = 0; i < steps; i++) {
+        float checkX = startX + stepX * i;
+        float checkY = startY + stepY * i;
+
+        int tileX = (int)(checkX / TILE_WIDTH);
+        int tileY = (int)(checkY / TILE_HEIGHT);
+
+        if (tileY >= 0 && tileY < (int)worldCollisionLayer.size() &&
+            tileX >= 0 && tileX < (int)worldCollisionLayer[0].size()) {
+            if (worldCollisionLayer[tileY][tileX].id != -1) {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 std::string Enemy::m_whereIsPlayer(float& playerXPos, float& playerYPos) {
@@ -149,9 +183,10 @@ void Enemy::updateAndCollide(float& moveX, float& moveY, const std::vector<std::
 
 }
 
-void Enemy::m_stateHandling(float& playerXPos, float& playerYPos) {
+void Enemy::m_stateHandling(float& playerXPos, float& playerYPos, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
     if (m_pathfindTimer >= m_pathfindTime) {
-        if (m_isPlayerNear(playerXPos, playerYPos) && !m_isInAttackRange(playerXPos, playerYPos)) { 
+        if (m_isPlayerNear(playerXPos, playerYPos) && !m_isInAttackRange(playerXPos, playerYPos) &&
+            canSeePlayer(playerXPos, playerYPos, worldCollisionLayer)) { 
             // enemy will pathfind towards the player when near
             m_pathfindTime = m_defaultPathfindTime;
             m_pathfindTimer = 0.0f;
