@@ -54,6 +54,7 @@ public:
     float m_pathfindTime = 0.1f;
     float m_attackPathfindTime = 0.1f;
     float m_defaultPathfindTime = 0.1f;
+    float m_defaultRandomTime = 0.5f;
 
     float m_speed = 80.0f; // Max move speed
     float m_moveSpeed = 50.0f;
@@ -87,6 +88,7 @@ public:
     void followPath(float deltaTime, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
 
     void debugPathDraw();
+    void debugSeePlayerDraw();
 protected:
     virtual void m_stateHandling(float& playerXPos, float& playerYPos, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
     virtual void m_stateCheck(float& deltaTime, float& moveY, float& moveX);

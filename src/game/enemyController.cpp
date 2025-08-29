@@ -10,6 +10,12 @@ void EnemyController::init(std::string map) {
         textures["Skeleton"] = m_loadTexture("assets/enemy/Skeleton.png");
 
         m_spawnSkeleton(10, 20, textures["Skeleton"]);
+        m_spawnSkeleton(10, 22, textures["Skeleton"]);
+        m_spawnSkeleton(10, 24, textures["Skeleton"]);
+        m_spawnSkeleton(10, 28, textures["Skeleton"]);
+        m_spawnSkeleton(10, 28, textures["Skeleton"]);
+        m_spawnSkeleton(10, 28, textures["Skeleton"]);
+        m_spawnSkeleton(10, 28, textures["Skeleton"]);
     }
 }
 void EnemyController::update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer) {

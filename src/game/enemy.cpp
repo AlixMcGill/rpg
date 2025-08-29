@@ -11,7 +11,7 @@ Enemy::Enemy(int startX, int startY, Texture& textrue)
     m_enemyTileX = 0;
     m_enemyTileY = 0;
     currentState = IDLE_DOWN;
-    setBoxCollider(4.0f, 4.0f, -2.0f, 2.0f);
+    setBoxCollider(2.0f, 2.0f, -1.0f, 2.0f);
 }
 
 void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer) {
@@ -42,10 +42,11 @@ void Enemy::draw() {
     DrawTexturePro(m_enemyTexture, source, dest, origin, 0.0f, WHITE);
 
     // draw the players collider bounds
-    //Rectangle collider = m_getCollisionBounds(xPos, yPos);
-    //DrawRectangleLinesEx(collider, 1, RED);
+    Rectangle collider = m_getCollisionBounds(xPos, yPos);
+    DrawRectangleLinesEx(collider, 1, RED);
     //
     debugPathDraw(); // Draws pathfinding 
+    debugSeePlayerDraw();
 }
 
 void Enemy::m_setStartPos(int x, int y) {
@@ -196,30 +197,14 @@ void Enemy::updateAndCollide(float& moveX, float& moveY, const std::vector<std::
 
 void Enemy::m_stateHandling(float& playerXPos, float& playerYPos, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
     if (m_pathfindTimer >= m_pathfindTime) {
-        if (m_isPlayerNear(playerXPos, playerYPos) && !m_isInAttackRange(playerXPos, playerYPos) &&
-            canSeePlayer(playerXPos, playerYPos, worldCollisionLayer)) { 
+        if ((m_isPlayerNear(playerXPos, playerYPos) && !m_isInAttackRange(playerXPos, playerYPos) &&
+            canSeePlayer(playerXPos, playerYPos, worldCollisionLayer)) || seenPlayer) { 
             // enemy will pathfind towards the player when near
             m_pathfindTime = m_defaultPathfindTime;
             m_pathfindTimer = 0.0f;
 
-            std::string whereIsPlayer = m_whereIsPlayer(playerXPos, playerYPos);
-
-            if (whereIsPlayer == "UP") {
-                currentState = WALK_UP;
-            } else if (whereIsPlayer == "DOWN") {
-                currentState = WALK_DOWN;
-            } else if (whereIsPlayer == "LEFT") {
-                currentState = WALK_LEFT;
-            } else if (whereIsPlayer == "RIGHT") {
-                currentState = WALK_RIGHT;
-            }
-
-        } else if (seenPlayer) {
-            m_pathfindTime = m_defaultPathfindTime;
-            m_pathfindTimer = 0.0f;
-
             if (path.empty()) {
-                computePath((int)(playerXPos / TILE_WIDTH), (int)(playerYPos / TILE_HEIGHT), worldCollisionLayer);
+                computePath((int)(seenPlayerLast.x), (int)(seenPlayerLast.y), worldCollisionLayer);
             }
 
             if (!path.empty()) {
@@ -237,8 +222,8 @@ void Enemy::m_stateHandling(float& playerXPos, float& playerYPos, const std::vec
                     currentState = (dy > 0) ? WALK_DOWN : WALK_UP;
                 }
 
-                if ((int)(xPos / TILE_WIDTH) == (int)nextTile.x &&
-                    (int)(yPos / TILE_HEIGHT) == (int)nextTile.y) {
+                float dist = std::sqrt(dx*dx + dy*dy);
+                if (dist < 5.0f) {
                     path.erase(path.begin());
                 }
             }
@@ -264,7 +249,7 @@ void Enemy::m_stateHandling(float& playerXPos, float& playerYPos, const std::vec
 
         } else {
             // enemy will randomly walk around if the player is not near
-            m_pathfindTime = m_defaultPathfindTime;
+            m_pathfindTime = m_defaultRandomTime;
             m_pathfindTimer = 0.0f;
             currentState = m_randomMoveState(); 
         }
@@ -327,13 +312,13 @@ void Enemy::m_stateCheck(float& deltaTime, float& moveY, float& moveX) {
 }
 
 void Enemy::m_arrivedLastSeen() {
-    float range = 1.5f;
+    float range = 1.0f;
     float dx = (xPos / TILE_WIDTH) - seenPlayerLast.x;
     float dy = (yPos / TILE_HEIGHT) - seenPlayerLast.y;
 
     if (std::fabs(dx) < range && std::fabs(dy) < range) {
         seenPlayer = false;
-        seenPlayerLast = {0.0f, 0.0f};
+        //seenPlayerLast = {0.0f, 0.0f};
         path.clear();
         std::cout << "Arrived" << std::endl;
     }
@@ -433,4 +418,11 @@ void Enemy::debugPathDraw() {
         Rectangle tileRect = { tile.x * TILE_WIDTH, tile.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT };
         DrawRectangleLinesEx(tileRect, 2, RED); // Draw red outline of path
     }
+}
+
+void Enemy::debugSeePlayerDraw() {
+// Draw detection radius
+    Vector2 center = { xPos + m_collisionRect.width / 2, yPos + m_collisionRect.height / 2 };
+    DrawCircleLines(center.x, center.y, m_playerDistance, RED); // outline
+    DrawCircle(center.x, center.y, 2.0f, YELLOW); // enemy center
 }
