@@ -1,5 +1,8 @@
 #include "enemy.h"
+#include <algorithm>
 #include <cstdlib>
+#include <cmath>
+#include <iostream>
 #include <raylib.h>
 
 Enemy::Enemy(int startX, int startY, Texture& textrue)
@@ -41,6 +44,8 @@ void Enemy::draw() {
     // draw the players collider bounds
     //Rectangle collider = m_getCollisionBounds(xPos, yPos);
     //DrawRectangleLinesEx(collider, 1, RED);
+    //
+    debugPathDraw(); // Draws pathfinding 
 }
 
 void Enemy::m_setStartPos(int x, int y) {
@@ -62,6 +67,7 @@ bool Enemy::m_isPlayerNear(float& playerXPos, float& playerYPos) {
     float playerDistance = distance(xPos, yPos, playerXPos, playerYPos);
 
     if (playerDistance <= m_playerDistance && playerDistance > 0) {
+        path.clear();
         return true;
     } else {
         return false;
@@ -105,14 +111,19 @@ bool Enemy::canSeePlayer(float& playerXPos, float& playerYPos, const std::vector
             tileX >= 0 && tileX < (int)worldCollisionLayer[0].size()) {
             if (worldCollisionLayer[tileY][tileX].id != -1) {
                 return false;
+            } else {
+                // store the x and y where the player was seen last to pathfind to
+                seenPlayerLast.x = tileX;
+                seenPlayerLast.y = tileY;
+                seenPlayer = true;
+                std::cout << "seen: " << seenPlayerLast.x << ", " << seenPlayerLast.y << std::endl;
             }
         }
     }
-
     return true;
 }
 
-std::string Enemy::m_whereIsPlayer(float& playerXPos, float& playerYPos) {
+std::string Enemy::m_whereIsPlayer(const float& playerXPos, const float& playerYPos) {
     if (std::abs(playerXPos - xPos) > std::abs(playerYPos - yPos)) {
         return (playerXPos > xPos) ? "RIGHT" : "LEFT";
     } else {
@@ -203,6 +214,37 @@ void Enemy::m_stateHandling(float& playerXPos, float& playerYPos, const std::vec
                 currentState = WALK_RIGHT;
             }
 
+        } else if (seenPlayer) {
+            m_pathfindTime = m_defaultPathfindTime;
+            m_pathfindTimer = 0.0f;
+
+            if (path.empty()) {
+                computePath((int)(playerXPos / TILE_WIDTH), (int)(playerYPos / TILE_HEIGHT), worldCollisionLayer);
+            }
+
+            if (!path.empty()) {
+                Vector2 nextTile = path.front();
+
+                float targetX = (nextTile.x + 0.5f) * TILE_WIDTH;
+                float targetY = (nextTile.y + 0.5f) * TILE_HEIGHT;
+
+                float dx = targetX - (xPos + m_collisionRect.width / 2);
+                float dy = targetY - (yPos + m_collisionRect.height / 2);
+
+                if (std::abs(dx) > std::abs(dy)) {
+                    currentState = (dx > 0) ? WALK_RIGHT : WALK_LEFT;
+                } else if (dy != 0) { 
+                    currentState = (dy > 0) ? WALK_DOWN : WALK_UP;
+                }
+
+                if ((int)(xPos / TILE_WIDTH) == (int)nextTile.x &&
+                    (int)(yPos / TILE_HEIGHT) == (int)nextTile.y) {
+                    path.erase(path.begin());
+                }
+            }
+            
+            m_arrivedLastSeen();
+
         } else if (m_isInAttackRange(playerXPos, playerYPos)) {
             // enemy will attack the player if near
             m_pathfindTime = m_attackPathfindTime;
@@ -227,7 +269,6 @@ void Enemy::m_stateHandling(float& playerXPos, float& playerYPos, const std::vec
             currentState = m_randomMoveState(); 
         }
     }
-
 }
 
 void Enemy::m_stateCheck(float& deltaTime, float& moveY, float& moveX) {
@@ -282,5 +323,114 @@ void Enemy::m_stateCheck(float& deltaTime, float& moveY, float& moveX) {
             break;
         default:
             break;
+    }
+}
+
+void Enemy::m_arrivedLastSeen() {
+    float range = 1.5f;
+    float dx = (xPos / TILE_WIDTH) - seenPlayerLast.x;
+    float dy = (yPos / TILE_HEIGHT) - seenPlayerLast.y;
+
+    if (std::fabs(dx) < range && std::fabs(dy) < range) {
+        seenPlayer = false;
+        seenPlayerLast = {0.0f, 0.0f};
+        path.clear();
+        std::cout << "Arrived" << std::endl;
+    }
+}
+
+void Enemy::computePath(int targetTileX, int targetTileY, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+    int startX = (int)(xPos / TILE_WIDTH);
+    int startY = (int)(yPos / TILE_HEIGHT);
+
+    struct Node {
+        int x, y;
+        float gCost, hCost;
+        Node* parent; 
+    };
+
+    std::vector<std::vector<bool>> closed(worldCollisionLayer.size(), std::vector<bool>(worldCollisionLayer[0].size(), false));
+    std::vector<std::vector<Node*>> allNodes(worldCollisionLayer.size(), std::vector<Node*>(worldCollisionLayer[0].size(), nullptr));
+
+    auto heuristic = [](int x1, int y1, int x2, int y2) {
+        float dx = (x1 > x2) ? x1 - x2 : x2 - x1;
+        float dy = (y1 > y2) ? y1 - y2 : y2 - y1;
+        return dx + dy;
+    };
+
+    std::vector<Node*> openList;
+
+    Node* start = new Node{ startX, startY, 0.0f, heuristic(startX, startY, targetTileX, targetTileY)};
+    openList.push_back(start);
+    allNodes[startY][startX] = start;
+
+    Node* endNode = nullptr;
+
+    while (!openList.empty()) {
+        // get the node with the lowest f cost
+        auto it = std::min_element(openList.begin(), openList.end(), [](Node* a, Node* b){return (a->gCost + a->hCost) < (b->gCost + b->hCost);});
+        Node* current = *it;
+        openList.erase(it);
+
+        if (current->x == targetTileX && current->y == targetTileY) {
+            endNode = current;
+            break;
+        }
+
+        closed[current->y][current->x] = true;
+
+        // check the neighbors
+        const int dirs[4][2] = {{0,-1},{0,1},{-1,0},{1,0}};
+
+        for (auto& d : dirs) {
+            int nx = current->x + d[0];
+            int ny = current->y + d[1];
+
+            if (nx < 0 || ny < 0 || ny >= (int)worldCollisionLayer.size() || nx >= (int)worldCollisionLayer[0].size())
+                continue;
+            if (worldCollisionLayer[ny][nx].id != -1 || closed[ny][nx])
+                continue;
+
+            float gNew = current->gCost + 1.0f;
+            Node* neighbor;
+
+            if (allNodes[ny][nx] == nullptr) {
+                neighbor = new Node{nx, ny, gNew, heuristic(nx, ny, targetTileX, targetTileY), current};
+                allNodes[ny][nx] = neighbor;
+                openList.push_back(neighbor);
+            } else {
+                neighbor = allNodes[ny][nx];
+                if (gNew < neighbor->gCost) {
+                    neighbor->gCost = gNew;
+                    neighbor->parent = current;
+                }
+            } 
+        }
+    }
+
+    // Reconstruct the path
+    path.clear();
+    if (endNode) {
+        Node* n = endNode;
+        while (n != nullptr && !(n->x == startX && n->y == startY)) {
+            path.insert(path.begin(), Vector2{(float)n->x, (float)n->y});
+            n = n->parent;
+        }
+    }
+
+    // cleanup
+    for (auto& row : allNodes)
+        for (auto& n : row)
+            delete n;
+}
+
+void Enemy::followPath(float deltaTime, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+
+}
+
+void Enemy::debugPathDraw() {
+    for (auto& tile : path) {
+        Rectangle tileRect = { tile.x * TILE_WIDTH, tile.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT };
+        DrawRectangleLinesEx(tileRect, 2, RED); // Draw red outline of path
     }
 }

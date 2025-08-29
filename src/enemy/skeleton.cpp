@@ -17,6 +17,7 @@ void Skeleton::update(float deltaTime, float& playerXPos, float& playerYPos, std
     updateAndCollide(moveX, moveY, collisionLayer);
 }
 
+/*
 void Skeleton::m_stateHandling(float& playerXPos, float& playerYPos, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
     if (m_pathfindTimer >= m_pathfindTime) {
         if (m_isPlayerNear(playerXPos, playerYPos) && !m_isInAttackRange(playerXPos, playerYPos) &&
@@ -117,4 +118,4 @@ void Skeleton::m_stateCheck(float& deltaTime, float& moveY, float& moveX) {
         default:
             break;
     }
-}
+} */

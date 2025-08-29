@@ -10,6 +10,9 @@
 #include <cstdlib>
 #include <ctime>
 #include <unordered_map>
+#include <algorithm>
+#include <queue>
+#include <cstdlib>
 
 #define TILE_WIDTH 16
 #define TILE_HEIGHT 16
