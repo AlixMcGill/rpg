@@ -34,6 +34,8 @@ public:
 
     state currentState;
 
+    Rectangle tileSize;
+
     Enemy(int startX, int startY, Texture& textrue);
     virtual void update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer);
     void draw();

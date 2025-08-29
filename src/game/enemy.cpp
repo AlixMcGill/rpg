@@ -12,6 +12,8 @@ Enemy::Enemy(int startX, int startY, Texture& textrue)
     m_enemyTileY = 0;
     currentState = IDLE_DOWN;
     setBoxCollider(2.0f, 2.0f, -1.0f, 2.0f);
+    tileSize.width = 32;
+    tileSize.height = 32;
 }
 
 void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer) {
@@ -27,26 +29,26 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
 }
 
 void Enemy::draw() {
-    Rectangle source = { (float)m_enemyTileX * PLAYER_TILE_WIDTH, (float)m_enemyTileY * PLAYER_TILE_HEIGHT, (float)PLAYER_TILE_WIDTH, (float)PLAYER_TILE_HEIGHT};
+    Rectangle source = { (float)m_enemyTileX * tileSize.width, (float)m_enemyTileY * tileSize.height, (float)tileSize.width, (float)tileSize.height};
 
     if (currentState == IDLE_LEFT || currentState == WALK_LEFT || currentState == ATTACK_LEFT) {
-        source.x = (float)(m_enemyTileX) * PLAYER_TILE_WIDTH; // right edge of current frame
-        source.width = -(float)PLAYER_TILE_WIDTH;                  // flip horizontally
+        source.x = (float)(m_enemyTileX) * tileSize.width; // right edge of current frame
+        source.width = -(float)tileSize.width;                  // flip horizontally
     } else {
-        source.x = (float)m_enemyTileX * PLAYER_TILE_WIDTH;      // left edge of current frame
-        source.width = (float)PLAYER_TILE_WIDTH;
+        source.x = (float)m_enemyTileX * tileSize.width;      // left edge of current frame
+        source.width = (float)tileSize.width;
     }
 
-    Rectangle dest = {(float)(xPos), (float)(yPos), (float)PLAYER_TILE_WIDTH, (float)PLAYER_TILE_HEIGHT};
+    Rectangle dest = {(float)(xPos), (float)(yPos), (float)tileSize.width, (float)tileSize.width};
     Vector2 origin = {16,16};
     DrawTexturePro(m_enemyTexture, source, dest, origin, 0.0f, WHITE);
 
     // draw the players collider bounds
-    Rectangle collider = m_getCollisionBounds(xPos, yPos);
-    DrawRectangleLinesEx(collider, 1, RED);
+    //Rectangle collider = m_getCollisionBounds(xPos, yPos);
+    //DrawRectangleLinesEx(collider, 1, RED);
     //
-    debugPathDraw(); // Draws pathfinding 
-    debugSeePlayerDraw();
+    //debugPathDraw(); // Draws pathfinding 
+    //debugSeePlayerDraw();
 }
 
 void Enemy::m_setStartPos(int x, int y) {

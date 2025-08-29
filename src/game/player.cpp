@@ -4,7 +4,7 @@
 
 void Player::init() {
     m_setStartPos(3, 3);
-    m_loadPlayerTexture("assets/player/Player.png");
+    m_loadPlayerTexture("assets/player/player.png");
 
     m_playerTileX = 6;
     m_playerTileY = 0;
@@ -24,71 +24,71 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
                 m_playerTileX = 0;
             }
         } else if (currentState == WALK_DOWN) {
-            m_playerTileY = 3;
+            m_playerTileY = 0;
             m_playerTileX++;
 
-            if (m_playerTileX > 5) {
+            if (m_playerTileX > 7) {
                 m_playerTileX = 0;
             }
         } else if (currentState == WALK_UP) {
-            m_playerTileY = 5;
+            m_playerTileY = 1;
             m_playerTileX++;
 
-            if (m_playerTileX > 5) {
+            if (m_playerTileX > 7) {
                 m_playerTileX = 0;
             }
         } else if (currentState == WALK_RIGHT || currentState == WALK_LEFT) {
-            m_playerTileY = 4;
-            m_playerTileX++;
-
-            if (m_playerTileX > 5) {
-                m_playerTileX = 0;
-            }
-        } else if (currentState == IDLE_UP) {
             m_playerTileY = 2;
             m_playerTileX++;
 
-            if (m_playerTileX > 5) {
+            if (m_playerTileX > 8) {
+                m_playerTileX = 0;
+            }
+        } else if (currentState == IDLE_UP) {
+            m_playerTileY = 1;
+            m_playerTileX++;
+
+            if (m_playerTileX > 1) {
                 m_playerTileX = 0;
             }
         } else if (currentState == IDLE_DOWN) {
             m_playerTileY = 0;
             m_playerTileX++;
 
-            if (m_playerTileX > 5) {
+            if (m_playerTileX > 1) {
                 m_playerTileX = 0;
             }
         } else if (currentState == IDLE_RIGHT || currentState == IDLE_LEFT) {
-            m_playerTileY = 1;
+            m_playerTileY = 2;
             m_playerTileX++;
 
-            if (m_playerTileX > 5) {
+            if (m_playerTileX > 1) {
                 m_playerTileX = 0;
             }
         }
 
         if (isAnimating) {
             if (currentState == ATTACK_DOWN) {
-                m_playerTileY = 6;
+                m_playerTileY = 3;
                 m_playerTileX++;
 
-                if (m_playerTileX > 3) {
+                if (m_playerTileX > 4) {
                     isAnimating = false;
                     m_playerTileX = 3;
                 }
             } else if (currentState == ATTACK_UP) {
-                m_playerTileY = 8;
+                m_playerTileY = 3;
                 m_playerTileX++;
 
-                if (m_playerTileX > 3) {
+                if (m_playerTileX > 4) {
                     isAnimating = false;
                     m_playerTileX = 3;
                 }
             } else if (currentState == ATTACK_RIGHT || currentState == ATTACK_LEFT) {
-                m_playerTileY = 7;
+                m_playerTileY = 3;
                 m_playerTileX++;
 
-                if (m_playerTileX > 3) {
+                if (m_playerTileX > 4) {
                     isAnimating = false;
                     m_playerTileX = 3;
                 }
@@ -212,7 +212,7 @@ void Player::draw() {
     }
 
     Rectangle dest = {(float)(xPos), (float)(yPos), (float)PLAYER_TILE_WIDTH, (float)PLAYER_TILE_HEIGHT};
-    Vector2 origin = {16,16};
+    Vector2 origin = {32,32};
     DrawTexturePro(m_playerTexture, source, dest, origin, 0.0f, WHITE);
 
 
