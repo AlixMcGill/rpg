@@ -25,3 +25,5 @@
 
 extern int windowWidth;
 extern int windowHeight;
+
+void setCollider(float width, float height, float offsetX, float offsetY, Rectangle& colliderRect);

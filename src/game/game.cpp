@@ -20,7 +20,7 @@ void Game::init() {
 
 void Game::update(float deltaTime) {
     //std::cout << "Game class update" << std::endl;
-    player.update(deltaTime, m_tilemap.worldCollisionLayer);
+    player.update(deltaTime, m_tilemap.worldCollisionLayer, m_enemyController.enemies);
     m_tilemap.updateCameraTarget(player.xPos, player.yPos);
     m_tilemap.cameraZoom();
     m_enemyController.update(deltaTime, player.xPos, player.yPos, m_tilemap.worldCollisionLayer);

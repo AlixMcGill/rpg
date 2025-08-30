@@ -1,17 +1,22 @@
 #include "player.h"
 #include "tilemap.h"
+#include <ostream>
 #include <raylib.h>
 
 void Player::init() {
     m_setStartPos(3, 3);
     m_loadPlayerTexture("assets/player/player.png");
 
+    m_setHitboxCollider(16.0f, 25.0f, -8.0f, -15.0f);
+    m_setAttackCollider(20.0f, 16.0f, -10.0f, 16.0f); // default is the down collider
+
     m_playerTileX = 6;
     m_playerTileY = 0;
     stamina = 100.0f;
 }
 
-void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer,
+                    std::vector<std::unique_ptr<Enemy>>& enemies) {
     m_frameTimer += deltaTime;
     if (m_frameTimer >= m_frameTime) { // Handles animations based off a timer
         m_frameTimer = 0.0f;
@@ -76,6 +81,9 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
                     isAnimating = false;
                     m_playerTileX = 3;
                 }
+
+                m_updateAttack(ATTACK_DOWN, enemies);
+
             } else if (currentState == ATTACK_UP) {
                 m_playerTileY = 3;
                 m_playerTileX++;
@@ -84,7 +92,10 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
                     isAnimating = false;
                     m_playerTileX = 3;
                 }
-            } else if (currentState == ATTACK_RIGHT || currentState == ATTACK_LEFT) {
+
+                m_updateAttack(ATTACK_UP, enemies);
+
+            } else if (currentState == ATTACK_RIGHT) {
                 m_playerTileY = 3;
                 m_playerTileX++;
 
@@ -92,6 +103,19 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
                     isAnimating = false;
                     m_playerTileX = 3;
                 }
+
+                m_updateAttack(ATTACK_RIGHT, enemies);
+
+            } else if (currentState == ATTACK_LEFT) {
+                m_playerTileY = 3;
+                m_playerTileX++;
+
+                if (m_playerTileX > 4) {
+                    isAnimating = false;
+                    m_playerTileX = 3;
+                }
+
+                m_updateAttack(ATTACK_LEFT, enemies);
             }
 
         }
@@ -173,6 +197,7 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
         else if (mouseDir == "LEFT") currentState = ATTACK_LEFT;
         else if (mouseDir == "RIGHT") currentState = ATTACK_RIGHT;
         isAnimating = true;
+        canAttack = true;
         m_playerTileX = 0;
         stamina -= 5.0f;
     } else if (!isAnimating) {
@@ -197,6 +222,8 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
         } 
     }
 
+    // Health Regen
+    m_regenHealth();
 }
 
 void Player::draw() {
@@ -216,9 +243,21 @@ void Player::draw() {
     DrawTexturePro(m_playerTexture, source, dest, origin, 0.0f, WHITE);
 
 
+    // debug drawing
+    if (renderDebug == true) {
+        Rectangle collider = m_getCollisionBounds(xPos, yPos);
+        DrawRectangleLinesEx(collider, 1, RED);
+
+        Rectangle hitColl = m_getHitboxBounds(xPos, yPos, hitBoxCollider);
+        DrawRectangleLinesEx(hitColl, 1, BLUE);
+
+        if (currentState == ATTACK_UP || currentState == ATTACK_DOWN ||
+            currentState == ATTACK_LEFT || currentState == ATTACK_RIGHT) { // only draw the debug lines when attacking
+            Rectangle attackColl = m_getHitboxBounds(xPos, yPos, attackCollider); 
+            DrawRectangleLinesEx(attackColl, 1, ORANGE);
+        }
+    }
     // draw the players collider bounds
-    Rectangle collider = m_getCollisionBounds(xPos, yPos);
-    DrawRectangleLinesEx(collider, 1, RED);
 }
 
 void Player::destroy() {
@@ -252,6 +291,13 @@ bool Player::isColliding(const Rectangle& playerBounds, const std::vector<std::v
     return false;
 }
 
+void Player::damagePlayer(float damage) {
+    health -= damage;
+}
+
+
+// Private Function
+
 
 void Player::m_setStartPos(int x, int y) {
     xPos = x * TILE_WIDTH;
@@ -274,6 +320,10 @@ Rectangle Player::m_getCollisionBounds(float futureX, float futureY) const {
     return {futureX + offsetX, futureY + offsetY, colliderWidth, colliderHeight};
 }
 
+Rectangle Player::m_getHitboxBounds(float futureX, float futureY, Rectangle& hitbox) const {
+    return {futureX + hitbox.x, futureY + hitbox.y, hitbox.width, hitbox.height};
+}
+
 std::string Player::m_getMouseDirection() {
     Vector2 screenMid = {(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2};
     Vector2 mousePos = GetMousePosition();
@@ -288,5 +338,59 @@ std::string Player::m_getMouseDirection() {
         return "UP";
     } else {
         return "LEFT";
+    }
+}
+
+void Player::m_regenHealth() {
+    health += healthRegen;
+
+    if (health >= maxHealth) {
+        health = maxHealth;
+    } else if (health <= 0.0f) {
+        m_killPlayer();
+    }
+}
+
+void Player::m_killPlayer() {
+
+}
+
+void Player::m_setHitboxCollider(float width, float height, float baseOffsetX, float baseOffsetY) {
+    setCollider(width, height, baseOffsetX, baseOffsetX, hitBoxCollider);
+}
+
+void Player::m_setAttackCollider(float width, float height, float baseOffsetX, float baseOffsetY) {
+    setCollider(width, height, baseOffsetX, baseOffsetY, attackCollider);
+}
+
+void Player::m_updateAttack(state AttackState, std::vector<std::unique_ptr<Enemy>>& enemies) {
+    switch (AttackState) { // updates the collider position
+        case ATTACK_UP: 
+            m_setAttackCollider(25.0f, 16.0f, -12.5f, -23.0f);
+            break;
+        case ATTACK_DOWN:
+            m_setAttackCollider(25.0f, 16.0f, -12.5f, 16.0f);
+            break;
+        case ATTACK_LEFT: 
+            m_setAttackCollider(16.0f, 25.0f, -23.0f, -8.0f);
+            break;
+        case ATTACK_RIGHT: 
+            m_setAttackCollider(16.0f, 25.0f, 8.0f, -8.0f);
+            break;
+        default:
+            break;
+    }
+
+    // handle the attack collision
+    //
+    // Check if the players attack hitbox is colliding with an enemys hitbox
+    for (auto& enemy : enemies) {
+        Rectangle playerAttackBox = m_getHitboxBounds(xPos, yPos, attackCollider);
+        Rectangle enemyHitBox = m_getHitboxBounds(enemy->xPos, enemy->yPos, enemy->hitBox);
+
+        if (CheckCollisionRecs(playerAttackBox, enemyHitBox) && canAttack) {
+            std::cout << "Hit Enemy" << std::endl;
+            canAttack = false;
+        }
     }
 }

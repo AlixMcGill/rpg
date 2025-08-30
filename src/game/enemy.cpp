@@ -12,6 +12,7 @@ Enemy::Enemy(int startX, int startY, Texture& textrue)
     m_enemyTileY = 0;
     currentState = IDLE_DOWN;
     setBoxCollider(2.0f, 2.0f, -1.0f, 2.0f);
+    setHitbox(16.0f, 20.0f, -8.0f, -10.0f);
     tileSize.width = 32;
     tileSize.height = 32;
 }
@@ -43,12 +44,17 @@ void Enemy::draw() {
     Vector2 origin = {16,16};
     DrawTexturePro(m_enemyTexture, source, dest, origin, 0.0f, WHITE);
 
+    if (renderDebug == true) {
     // draw the players collider bounds
-    //Rectangle collider = m_getCollisionBounds(xPos, yPos);
-    //DrawRectangleLinesEx(collider, 1, RED);
-    //
-    //debugPathDraw(); // Draws pathfinding 
-    //debugSeePlayerDraw();
+        Rectangle collider = m_getCollisionBounds(xPos, yPos);
+        DrawRectangleLinesEx(collider, 1, RED);
+
+        Rectangle hitBounds = getHitboxbounds(xPos, yPos);
+        DrawRectangleLinesEx(hitBounds, 1, BLUE);
+
+        debugPathDraw(); // Draws pathfinding 
+        debugSeePlayerDraw();
+    }
 }
 
 void Enemy::m_setStartPos(int x, int y) {
@@ -119,7 +125,7 @@ bool Enemy::canSeePlayer(float& playerXPos, float& playerYPos, const std::vector
                 seenPlayerLast.x = tileX;
                 seenPlayerLast.y = tileY;
                 seenPlayer = true;
-                std::cout << "seen: " << seenPlayerLast.x << ", " << seenPlayerLast.y << std::endl;
+                //std::cout << "seen: " << seenPlayerLast.x << ", " << seenPlayerLast.y << std::endl;
             }
         }
     }
@@ -141,8 +147,16 @@ void Enemy::setBoxCollider(float width, float height, float offsetX, float offse
     m_collisionOffset.y = offsetY;
 }
 
+void Enemy::setHitbox(float width, float height, float offsetX, float offsetY) {
+    setCollider(width, height, offsetX, offsetY, hitBox);
+}
+
 Rectangle Enemy::m_getCollisionBounds(float futureX, float futureY) const {
     return {futureX + m_collisionOffset.x, futureY + m_collisionOffset.y, m_collisionRect.width, m_collisionRect.height};
+}
+
+Rectangle Enemy::getHitboxbounds(float futureX, float futureY) const {
+    return {futureX + hitBox.x, futureY + hitBox.y, hitBox.width, hitBox.height};
 }
 
 bool Enemy::isColliding(const Rectangle& bounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
@@ -322,7 +336,7 @@ void Enemy::m_arrivedLastSeen() {
         seenPlayer = false;
         //seenPlayerLast = {0.0f, 0.0f};
         path.clear();
-        std::cout << "Arrived" << std::endl;
+        //std::cout << "Arrived" << std::endl;
     }
 }
 

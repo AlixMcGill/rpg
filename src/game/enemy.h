@@ -16,6 +16,11 @@ struct TileNode {
 
 class Enemy : public Entity {
 public:
+    bool renderDebug = true;
+
+    float health = 100.0f;
+    float maxHealth = 100.0f;
+
     enum state {
         IDLE_UP,
         IDLE_DOWN,
@@ -48,6 +53,8 @@ public:
     Rectangle m_collisionRect;
     Vector2 m_collisionOffset;
 
+    Rectangle hitBox;
+
     float m_frameTimer = 0.0f;
     float m_frameTime = 0.12f;
     float m_defaultFrameTime = 0.12f;
@@ -69,6 +76,7 @@ public:
 
     std::vector<Vector2> path; // path for a* algorithm
 
+    void setHitbox(float width, float height, float offsetX, float offsetY);
     void m_setStartPos(int x, int y);
     state m_randomMoveState();
     void m_moveTowardsPlayer(float& playerXPos, float& playerYPos);
@@ -78,6 +86,7 @@ public:
     std::string m_whereIsPlayer(const float& playerXPos, const float& playerYPos);
     void m_arrivedLastSeen();
     Rectangle m_getCollisionBounds(float futureX, float futureY) const;
+    Rectangle getHitboxbounds(float futureX, float futureY) const;
     bool isColliding(const Rectangle& bounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
 
     void updateAndCollide(float& moveX, float& moveY, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);

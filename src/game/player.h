@@ -2,14 +2,20 @@
 #include "../utils/project.h"
 #include "entity.h"
 #include "tilemap.h"
+#include "enemyController.h"
 #include <raylib.h>
 
 class Player : public Entity {
 public:
+    bool renderDebug = true;
     float stamina;
-    float health;
+    float health = 100.0f;
+    float maxHealth = 100.0f;
+
+    float healthRegen = 0.01f;
 
     bool isAnimating = false;
+    bool canAttack = true;
 
     enum state {
         IDLE,
@@ -30,12 +36,19 @@ public:
 
     state currentState;
 
+    Rectangle hitBoxCollider;
+    Rectangle attackCollider;
+
     void init();
-    void update(float deltaTime,const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
+    void update(float deltaTime,
+                const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer,
+                std::vector<std::unique_ptr<Enemy>>& enemies);
     void draw();
     void destroy();
 
     bool isColliding(const Rectangle& playerBounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
+
+    void damagePlayer(float damage);
 private:
     Texture2D m_playerTexture;
     int m_playerTileX;
@@ -56,5 +69,13 @@ private:
     void m_setStartPos(int x, int y);
     void m_loadPlayerTexture(const char* imgPath);
     Rectangle m_getCollisionBounds(float futureX, float futureY) const;
+    Rectangle m_getHitboxBounds(float futureX, float futureY, Rectangle& hitbox) const;
     std::string m_getMouseDirection();
+    void m_regenHealth();
+    void m_killPlayer();
+
+    void m_setHitboxCollider(float width, float height, float baseOffsetX, float baseOffsetY);
+    void m_setAttackCollider(float width, float height, float baseOffsetX, float baseOffsetY);
+
+    void m_updateAttack(state AttackState,std::vector<std::unique_ptr<Enemy>>& enemies);
 };
