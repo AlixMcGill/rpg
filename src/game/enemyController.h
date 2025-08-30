@@ -18,7 +18,7 @@ public:
     void update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer);
     void drawBehindPlayer();
     void drawFrontPlayer();
-    void destroy();
+    void destroy(); 
 private:
     void m_sortDrawOrder(float& playerYPos);
     Texture m_loadTexture(const char* path);

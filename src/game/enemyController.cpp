@@ -1,4 +1,5 @@
 #include "enemyController.h"
+#include <algorithm>
 #include <memory>
 #include <raylib.h>
 
@@ -16,6 +17,13 @@ void EnemyController::init(std::string map) {
         m_spawnSkeleton(10, 28, textures["Skeleton"]);
         m_spawnSkeleton(10, 28, textures["Skeleton"]);
         m_spawnSkeleton(10, 28, textures["Skeleton"]);
+        m_spawnSkeleton(20, 15, textures["Skeleton"]);
+        m_spawnSkeleton(20, 15, textures["Skeleton"]);
+        m_spawnSkeleton(20, 15, textures["Skeleton"]);
+        m_spawnSkeleton(20, 15, textures["Skeleton"]);
+        m_spawnSkeleton(20, 15, textures["Skeleton"]);
+        m_spawnSkeleton(20, 15, textures["Skeleton"]);
+        m_spawnSkeleton(20, 15, textures["Skeleton"]);
     }
 }
 void EnemyController::update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer) {
@@ -30,6 +38,16 @@ void EnemyController::drawBehindPlayer() {
     for (auto& e : behindPlayerEnemys) {
             e->draw();
     }
+
+    // Garbage collect any dead enemies
+    enemies.erase(
+        std::remove_if(enemies.begin(), enemies.end(),
+            [](const std::unique_ptr<Enemy>& e) {
+                return e->isDead();
+            }
+        ),
+        enemies.end()
+    );
 }
 
 void EnemyController::drawFrontPlayer() {

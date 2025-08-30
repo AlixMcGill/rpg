@@ -16,7 +16,7 @@ struct TileNode {
 
 class Enemy : public Entity {
 public:
-    bool renderDebug = true;
+    bool renderDebug = false;
 
     float health = 100.0f;
     float maxHealth = 100.0f;
@@ -46,6 +46,9 @@ public:
     void draw();
     void setBoxCollider(float width, float height, float offsetX, float offsetY);
 
+    void takeDamage(float damage);
+    bool isDead();
+
     Texture2D& m_enemyTexture;
     int m_enemyTileX;
     int m_enemyTileY;
@@ -74,6 +77,16 @@ public:
     bool seenPlayer = false;
     Vector2 seenPlayerLast;
 
+    struct DamageText {
+        Vector2 position;
+        std::string text;
+        float timer;
+        float duration;
+        Color color;
+        float speedY;
+    };
+    std::vector<DamageText> damageTexts;
+
     std::vector<Vector2> path; // path for a* algorithm
 
     void setHitbox(float width, float height, float offsetX, float offsetY);
@@ -93,6 +106,7 @@ public:
 
     // tells the renderer what tiles to render on the sprite sheet
     void animate(float startY, float endX);
+    void damageTextUpdate(float deltaTime);
 
     // A* algorithm
     void computePath(int targetTileX, int targetTileY, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);

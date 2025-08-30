@@ -14,8 +14,8 @@ public:
 
     float healthRegen = 0.01f;
 
-    bool isAnimating = false;
-    bool canAttack = true;
+    bool isAnimating = false; // used for atttack animations / state changes prob should change later
+    bool canAttack = true; // flag to stop multiple attacks from rendering off of one hit 
 
     enum state {
         IDLE,
@@ -55,8 +55,8 @@ private:
     int m_playerTileY;
 
     float m_frameTimer = 0.0f;
-    float m_frameTime = 0.12f;
-    float m_defaultFrameTime = 0.12f;
+    float m_frameTime = 0.10f;
+    float m_defaultFrameTime = 0.10f;
 
     float m_speed;
     float m_accel = 800.0f;

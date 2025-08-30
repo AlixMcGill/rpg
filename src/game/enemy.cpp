@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <raylib.h>
+#include <string>
 
 Enemy::Enemy(int startX, int startY, Texture& textrue)
         : m_enemyTexture(textrue) {
@@ -27,6 +28,7 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
     m_stateHandling(playerXPos, playerYPos, collisionLayer);
     m_stateCheck(deltaTime, moveY, moveX);
     updateAndCollide(moveX, moveY, collisionLayer);
+    damageTextUpdate(deltaTime);
 }
 
 void Enemy::draw() {
@@ -43,6 +45,14 @@ void Enemy::draw() {
     Rectangle dest = {(float)(xPos), (float)(yPos), (float)tileSize.width, (float)tileSize.width};
     Vector2 origin = {16,16};
     DrawTexturePro(m_enemyTexture, source, dest, origin, 0.0f, WHITE);
+
+
+    // Render damageTexts
+    for (auto& dt : damageTexts) {
+        //std::cout << dt.position.y << std::endl;
+        DrawText(dt.text.c_str(), (int)(dt.position.x) - 1, (int)(dt.position.y) + 1, 2, BLACK);
+        DrawText(dt.text.c_str(), (int)(dt.position.x), (int)(dt.position.y), 1, dt.color);
+    }
 
     if (renderDebug == true) {
     // draw the players collider bounds
@@ -441,4 +451,46 @@ void Enemy::debugSeePlayerDraw() {
     Vector2 center = { xPos + m_collisionRect.width / 2, yPos + m_collisionRect.height / 2 };
     DrawCircleLines(center.x, center.y, m_playerDistance, RED); // outline
     DrawCircle(center.x, center.y, 2.0f, YELLOW); // enemy center
+}
+
+void Enemy::takeDamage(float damage) {
+    health -= damage;
+
+    DamageText dt;
+    dt.position = {xPos, yPos - 20.0f};
+    dt.text = std::to_string(static_cast<int>(damage));
+    dt.timer = 0.0f;
+    dt.duration = 1.5f;
+    dt.color = RED;
+    dt.speedY = 15.0f;
+
+    damageTexts.push_back(dt);
+}
+
+bool Enemy::isDead() {
+    if (health <= 0.0f) {
+        damageTexts.clear();
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void Enemy::damageTextUpdate(float deltaTime) {
+    for (auto& dt : damageTexts) {
+        dt.timer += deltaTime;
+        dt.position.y -= dt.speedY * deltaTime;  // move upward
+
+        float alpha = 1.0f - (dt.timer / dt.duration);
+        if (alpha < 0.0f) alpha = 0.0f;
+        dt.color.a = static_cast<unsigned char>(alpha * 255);
+    }
+
+    damageTexts.erase(
+        std::remove_if(damageTexts.begin(), damageTexts.end(),
+            [](const DamageText& dt) {
+                return dt.timer >= dt.duration;  // remove expired
+            }),
+        damageTexts.end()
+    );
 }

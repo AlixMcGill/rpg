@@ -254,7 +254,7 @@ void Player::draw() {
         if (currentState == ATTACK_UP || currentState == ATTACK_DOWN ||
             currentState == ATTACK_LEFT || currentState == ATTACK_RIGHT) { // only draw the debug lines when attacking
             Rectangle attackColl = m_getHitboxBounds(xPos, yPos, attackCollider); 
-            DrawRectangleLinesEx(attackColl, 1, ORANGE);
+            DrawRectangleLinesEx(attackColl, 1, RED);
         }
     }
     // draw the players collider bounds
@@ -384,13 +384,16 @@ void Player::m_updateAttack(state AttackState, std::vector<std::unique_ptr<Enemy
     // handle the attack collision
     //
     // Check if the players attack hitbox is colliding with an enemys hitbox
-    for (auto& enemy : enemies) {
-        Rectangle playerAttackBox = m_getHitboxBounds(xPos, yPos, attackCollider);
-        Rectangle enemyHitBox = m_getHitboxBounds(enemy->xPos, enemy->yPos, enemy->hitBox);
+    if (canAttack) {
+        for (auto& enemy : enemies) {
+            Rectangle playerAttackBox = m_getHitboxBounds(xPos, yPos, attackCollider);
+            Rectangle enemyHitBox = m_getHitboxBounds(enemy->xPos, enemy->yPos, enemy->hitBox);
 
-        if (CheckCollisionRecs(playerAttackBox, enemyHitBox) && canAttack) {
-            std::cout << "Hit Enemy" << std::endl;
-            canAttack = false;
+            if (CheckCollisionRecs(playerAttackBox, enemyHitBox)) {
+                //std::cout << "Hit Enemy" << std::endl;
+                enemy->takeDamage(38.0f);
+            }
         }
     }
+    canAttack = false; // can attack flag used to stop multiple hits from being registerd on one enemy per attack click
 }
