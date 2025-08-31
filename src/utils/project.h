@@ -26,4 +26,17 @@
 extern int windowWidth;
 extern int windowHeight;
 
+struct DamageText {
+    Vector2 position;
+    std::string text;
+    float timer;
+    float duration;
+    Color color;
+    float speedY;
+};
+
 void setCollider(float width, float height, float offsetX, float offsetY, Rectangle& colliderRect);
+
+// Dice rolls
+int rollD20();
+int rollD10();

@@ -23,7 +23,7 @@ void Game::update(float deltaTime) {
     player.update(deltaTime, m_tilemap.worldCollisionLayer, m_enemyController.enemies);
     m_tilemap.updateCameraTarget(player.xPos, player.yPos);
     m_tilemap.cameraZoom();
-    m_enemyController.update(deltaTime, player.xPos, player.yPos, m_tilemap.worldCollisionLayer);
+    m_enemyController.update(deltaTime, player.xPos, player.yPos, player, m_tilemap.worldCollisionLayer);
     //skely.update(deltaTime, player.xPos, player.yPos, m_tilemap.worldCollisionLayer);
 }
 

@@ -9,16 +9,18 @@ void Skeleton::update(float deltaTime,
         float& playerXPos, 
         float& playerYPos, 
         std::vector<std::vector<Tilemap::sTile>>& collisionLayer,
-        std::vector<DamageText>& damageTexts
+        std::vector<DamageText>& damageTexts,
+        Player& player
         ) {
     m_frameTimer += deltaTime;
     m_pathfindTimer += deltaTime;
+    attackTimer(deltaTime);
 
     float moveX = 0.0f;
     float moveY = 0.0f;
 
     m_stateHandling(playerXPos, playerYPos, collisionLayer);
-    m_stateCheck(deltaTime, moveY, moveX);
+    m_stateCheck(deltaTime, moveY, moveX, player);
     updateAndCollide(moveX, moveY, collisionLayer);
     damageTextUpdate(deltaTime, damageTexts);
 }

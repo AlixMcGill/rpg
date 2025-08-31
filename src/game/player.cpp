@@ -13,6 +13,7 @@ void Player::init() {
     m_playerTileX = 6;
     m_playerTileY = 0;
     stamina = 100.0f;
+    health = maxHealth;
 }
 
 void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer,
@@ -224,6 +225,9 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
 
     // Health Regen
     m_regenHealth();
+
+    // Damage Text
+    m_updateDamageTexts(deltaTime);
 }
 
 void Player::draw() {
@@ -241,6 +245,11 @@ void Player::draw() {
     Rectangle dest = {(float)(xPos), (float)(yPos), (float)PLAYER_TILE_WIDTH, (float)PLAYER_TILE_HEIGHT};
     Vector2 origin = {32,32};
     DrawTexturePro(m_playerTexture, source, dest, origin, 0.0f, WHITE);
+
+    // draw any damageTexts
+    for (auto& dt : damageTexts) {
+        DrawText(dt.text.c_str(), (int)(dt.position.x), (int)(dt.position.y), 1, dt.color);
+    }
 
 
     // debug drawing
@@ -293,6 +302,16 @@ bool Player::isColliding(const Rectangle& playerBounds, const std::vector<std::v
 
 void Player::damagePlayer(float damage) {
     health -= damage;
+
+    DamageText dt;
+    dt.position = {xPos + ((std::rand() % 11) - 5), yPos - 20.0f};
+    dt.text = std::to_string(static_cast<int>(damage));
+    dt.timer = 0.0f;
+    dt.duration = 1.5f;
+    dt.color = WHITE;
+    dt.speedY = 40.0f + ((std::rand() % 11) - 5);
+
+    damageTexts.push_back(dt);
 }
 
 
@@ -352,7 +371,14 @@ void Player::m_regenHealth() {
 }
 
 void Player::m_killPlayer() {
+    m_setStartPos(3, 3);
+    m_setHitboxCollider(16.0f, 25.0f, -8.0f, -15.0f);
+    m_setAttackCollider(20.0f, 16.0f, -10.0f, 16.0f); // default is the down collider
 
+    m_playerTileX = 6;
+    m_playerTileY = 0;
+    stamina = 100.0f;
+    health = maxHealth;
 }
 
 void Player::m_setHitboxCollider(float width, float height, float baseOffsetX, float baseOffsetY) {
@@ -391,9 +417,46 @@ void Player::m_updateAttack(state AttackState, std::vector<std::unique_ptr<Enemy
 
             if (CheckCollisionRecs(playerAttackBox, enemyHitBox)) {
                 //std::cout << "Hit Enemy" << std::endl;
-                enemy->takeDamage(38.0f);
+                float dis = distance(xPos, yPos, enemy->xPos, enemy->yPos);
+                enemy->takeDamage(m_getMeleeDamage(dis));
             }
         }
     }
     canAttack = false; // can attack flag used to stop multiple hits from being registerd on one enemy per attack click
+}
+
+float Player::m_getMeleeDamage(float dist) {
+    float maxRange = 90.0f;
+    float baseDamage = 10.0f;
+
+    float distFactor = std::max(0.0f, 1.0f - (dist / maxRange));
+    float roll = rollD20();
+
+    float dam = (baseDamage + roll) * distFactor;
+
+    if (dam < baseDamage) {
+        return baseDamage;
+    } else {
+        return dam;
+    }
+}
+
+void Player::m_updateDamageTexts(float deltaTime) {
+    for (auto& dt : damageTexts) {
+        dt.timer += deltaTime;
+        dt.position.y -= dt.speedY * deltaTime;  // move upward
+
+        float alpha = 1.0f - (dt.timer / dt.duration);
+        if (alpha < 0.0f) alpha = 0.0f;
+        dt.color.a = static_cast<unsigned char>(alpha * 255);
+    }
+
+    damageTexts.erase(
+        std::remove_if(damageTexts.begin(), damageTexts.end(),
+            [](const DamageText& dt) {
+                return dt.timer >= dt.duration;  // remove expired
+            }),
+        damageTexts.end()
+    );
+
 }

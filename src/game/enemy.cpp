@@ -1,4 +1,5 @@
 #include "enemy.h"
+#include "player.h"
 #include <algorithm>
 #include <cstdlib>
 #include <cmath>
@@ -21,21 +22,22 @@ Enemy::Enemy(int startX, int startY, Texture& textrue)
 void Enemy::update(float deltaTime, 
                 float& playerXPos, float& playerYPos, 
                 std::vector<std::vector<Tilemap::sTile>>& collisionLayer,
-                std::vector<DamageText>& damageTexts
-                ) {
+                std::vector<DamageText>& damageTexts,
+                Player& player) {
     m_frameTimer += deltaTime;
     m_pathfindTimer += deltaTime;
+    attackTimer(deltaTime);
 
     float moveX = 0.0f;
     float moveY = 0.0f;
 
     m_stateHandling(playerXPos, playerYPos, collisionLayer);
-    m_stateCheck(deltaTime, moveY, moveX);
+    m_stateCheck(deltaTime, moveY, moveX, player);
     updateAndCollide(moveX, moveY, collisionLayer);
     damageTextUpdate(deltaTime, damageTexts);
 }
 
-void Enemy::draw(std::vector<Enemy::DamageText>& damageTexts ) {
+void Enemy::draw(std::vector<DamageText>& damageTexts ) {
     Rectangle source = { (float)m_enemyTileX * tileSize.width, (float)m_enemyTileY * tileSize.height, (float)tileSize.width, (float)tileSize.height};
 
     if (currentState == IDLE_LEFT || currentState == WALK_LEFT || currentState == ATTACK_LEFT) {
@@ -54,8 +56,8 @@ void Enemy::draw(std::vector<Enemy::DamageText>& damageTexts ) {
     // Render damageTexts
     for (auto& dt : damageTexts) {
         //std::cout << dt.position.y << std::endl;
-        DrawText(dt.text.c_str(), (int)(dt.position.x) - 1, (int)(dt.position.y) + 1, 2, BLACK);
-        DrawText(dt.text.c_str(), (int)(dt.position.x), (int)(dt.position.y), 1, dt.color);
+        //DrawText(dt.text.c_str(), (int)(dt.position.x) - 1, (int)(dt.position.y) + 1, 2, BLACK);
+        DrawText(dt.text.c_str(), (int)(dt.position.x), (int)(dt.position.y), -10, dt.color);
     }
 
     if (renderDebug == true) {
@@ -286,55 +288,75 @@ void Enemy::m_stateHandling(float& playerXPos, float& playerYPos, const std::vec
     }
 }
 
-void Enemy::m_stateCheck(float& deltaTime, float& moveY, float& moveX) {
+void Enemy::m_stateCheck(float& deltaTime, float& moveY, float& moveX, Player& player) {
     switch (currentState) {
         case IDLE_UP:
             currentState = IDLE_UP;
             animate(2.0f, 5.0f);
+            canAttack = true;
             break;
         case IDLE_DOWN:
             currentState = IDLE_DOWN;
             animate(0.0f, 5.0f);
+            canAttack = true;
             break;
         case IDLE_LEFT:
             currentState = IDLE_LEFT;
             animate(1.0f, 5.0f);
+            canAttack = true;
             break;
         case IDLE_RIGHT:
             currentState = IDLE_RIGHT;
             animate(1, 5.0f);
+            canAttack = true;
             break;
         case WALK_UP:
             currentState = WALK_UP;
             moveY += -m_moveSpeed * deltaTime;
             animate(2.0f, 5.0f);
+            canAttack = true;
             break;
         case WALK_DOWN:
             currentState = WALK_DOWN;
             moveY += m_moveSpeed * deltaTime;
             animate(3.0f, 5.0f);
+            canAttack = true;
             break;
         case WALK_LEFT:
             currentState = WALK_LEFT;
             moveX += -m_moveSpeed * deltaTime;
             animate(4.0f, 5.0f);
+            canAttack = true;
             break;
         case WALK_RIGHT:
             currentState = WALK_RIGHT;
             moveX += m_moveSpeed * deltaTime;
             animate(4.0f, 5.0f);
+            canAttack = true;
             break;
         case ATTACK_UP:
             animate(9.0f, 3.0f);
+
+            attackUpdate(player);
+            canAttack = false;
             break;
         case ATTACK_DOWN:
             animate(7.0f, 3.0f);
+
+            attackUpdate(player);
+            canAttack = false;
             break;
         case ATTACK_LEFT:
             animate(8.0f, 3.0f);
+
+            attackUpdate(player);
+            canAttack = false;
             break;
         case ATTACK_RIGHT:
             animate(8.0f, 3.0f);
+
+            attackUpdate(player);
+            canAttack = false;
             break;
         default:
             break;
@@ -475,14 +497,49 @@ void Enemy::damageTextUpdate(float deltaTime, std::vector<DamageText>& damageTex
 
     if (tookDamage) {
         DamageText dt;
-        dt.position = {xPos, yPos - 20.0f};
+        dt.position = {xPos + (int)((std::rand() % 5) - 2), yPos - 20.0f};
         dt.text = std::to_string(static_cast<int>(damageTaken));
         dt.timer = 0.0f;
         dt.duration = 1.5f;
-        dt.color = RED;
-        dt.speedY = 10.0f;
+        dt.color = {255,0,72,255};
+        dt.speedY = 40.0f + ((std::rand() % 11) - 5);
 
         damageTexts.push_back(dt);
         tookDamage = false;
+    }
+}
+
+void Enemy::attackUpdate(Player& player) {
+    if (canAttack) {
+        float dist = distance(xPos, yPos, player.xPos, player.yPos);
+        float damage = getMeleeDamage(dist);
+        std::cout << "Damaged Player: " << damage << std::endl;
+        player.damagePlayer(damage);
+    }
+}
+
+float Enemy::getMeleeDamage(float dist) {
+    float maxRange = m_attackRange - 5.0f;
+    float baseDamage = 3.0f;
+
+    float distFactor = std::max(0.0f, 1.0f - (dist / maxRange));
+    float roll = rollD10();
+
+    float dam = (baseDamage + roll) * distFactor;
+
+    if (dam < baseDamage) {
+        return baseDamage;
+    } else {
+        return dam;
+    }
+
+}
+
+void Enemy::attackTimer(float deltaTime) {
+    attackResetTimer += deltaTime;
+
+    if (attackResetTimer >= attackResetTime) {
+        attackResetTimer = 0.0f;
+        canAttack = true;
     }
 }

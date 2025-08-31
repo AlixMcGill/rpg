@@ -13,22 +13,15 @@ void EnemyController::init(std::string map) {
         m_spawnSkeleton(10, 20, textures["Skeleton"]);
         m_spawnSkeleton(10, 22, textures["Skeleton"]);
         m_spawnSkeleton(10, 24, textures["Skeleton"]);
+        m_spawnSkeleton(10, 18, textures["Skeleton"]);
+        m_spawnSkeleton(30, 18, textures["Skeleton"]);
+        m_spawnSkeleton(10, 38, textures["Skeleton"]);
         m_spawnSkeleton(10, 28, textures["Skeleton"]);
-        m_spawnSkeleton(10, 28, textures["Skeleton"]);
-        m_spawnSkeleton(10, 28, textures["Skeleton"]);
-        m_spawnSkeleton(10, 28, textures["Skeleton"]);
-        m_spawnSkeleton(20, 15, textures["Skeleton"]);
-        m_spawnSkeleton(20, 15, textures["Skeleton"]);
-        m_spawnSkeleton(20, 15, textures["Skeleton"]);
-        m_spawnSkeleton(20, 15, textures["Skeleton"]);
-        m_spawnSkeleton(20, 15, textures["Skeleton"]);
-        m_spawnSkeleton(20, 15, textures["Skeleton"]);
-        m_spawnSkeleton(20, 15, textures["Skeleton"]);
     }
 }
-void EnemyController::update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer) {
+void EnemyController::update(float deltaTime, float& playerXPos, float& playerYPos, Player& player, std::vector<std::vector<Tilemap::sTile>>& collisionLayer) {
     for (auto& e : enemies) {
-        e->update(deltaTime, playerXPos, playerYPos, collisionLayer, damageTexts);
+        e->update(deltaTime, playerXPos, playerYPos, collisionLayer, damageTexts, player);
     }
 
     m_updateDamageTexts(deltaTime);
@@ -101,7 +94,7 @@ void EnemyController::m_updateDamageTexts(float deltaTime) {
 
     damageTexts.erase(
         std::remove_if(damageTexts.begin(), damageTexts.end(),
-            [](const Enemy::DamageText& dt) {
+            [](const DamageText& dt) {
                 return dt.timer >= dt.duration;  // remove expired
             }),
         damageTexts.end()

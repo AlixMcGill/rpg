@@ -78,4 +78,9 @@ private:
     void m_setAttackCollider(float width, float height, float baseOffsetX, float baseOffsetY);
 
     void m_updateAttack(state AttackState,std::vector<std::unique_ptr<Enemy>>& enemies);
+
+    float m_getMeleeDamage(float distance);
+
+    std::vector<DamageText> damageTexts;
+    void m_updateDamageTexts(float deltaTime);
 };

@@ -5,6 +5,7 @@
 #include "../enemy/skeleton.h"
 #include <algorithm>
 #include <memory>
+#include "player.h"
 
 class EnemyController {
 public:
@@ -14,10 +15,10 @@ public:
 
     std::unordered_map<std::string, Texture> textures;
 
-    std::vector<Enemy::DamageText> damageTexts;
+    std::vector<DamageText> damageTexts;
 
     void init(std::string map);
-    void update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer);
+    void update(float deltaTime, float& playerXPos, float& playerYPos, Player& player, std::vector<std::vector<Tilemap::sTile>>& collisionLayer);
     void drawBehindPlayer();
     void drawFrontPlayer();
     void destroy(); 
