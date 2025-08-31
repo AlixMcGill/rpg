@@ -18,7 +18,11 @@ Enemy::Enemy(int startX, int startY, Texture& textrue)
     tileSize.height = 32;
 }
 
-void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer) {
+void Enemy::update(float deltaTime, 
+                float& playerXPos, float& playerYPos, 
+                std::vector<std::vector<Tilemap::sTile>>& collisionLayer,
+                std::vector<DamageText>& damageTexts
+                ) {
     m_frameTimer += deltaTime;
     m_pathfindTimer += deltaTime;
 
@@ -28,10 +32,10 @@ void Enemy::update(float deltaTime, float& playerXPos, float& playerYPos, std::v
     m_stateHandling(playerXPos, playerYPos, collisionLayer);
     m_stateCheck(deltaTime, moveY, moveX);
     updateAndCollide(moveX, moveY, collisionLayer);
-    damageTextUpdate(deltaTime);
+    damageTextUpdate(deltaTime, damageTexts);
 }
 
-void Enemy::draw() {
+void Enemy::draw(std::vector<Enemy::DamageText>& damageTexts ) {
     Rectangle source = { (float)m_enemyTileX * tileSize.width, (float)m_enemyTileY * tileSize.height, (float)tileSize.width, (float)tileSize.height};
 
     if (currentState == IDLE_LEFT || currentState == WALK_LEFT || currentState == ATTACK_LEFT) {
@@ -455,42 +459,30 @@ void Enemy::debugSeePlayerDraw() {
 
 void Enemy::takeDamage(float damage) {
     health -= damage;
-
-    DamageText dt;
-    dt.position = {xPos, yPos - 20.0f};
-    dt.text = std::to_string(static_cast<int>(damage));
-    dt.timer = 0.0f;
-    dt.duration = 1.5f;
-    dt.color = RED;
-    dt.speedY = 15.0f;
-
-    damageTexts.push_back(dt);
+    tookDamage = true;
+    damageTaken = damage;
 }
 
 bool Enemy::isDead() {
     if (health <= 0.0f) {
-        damageTexts.clear();
         return true;
     } else {
         return false;
     }
 }
 
-void Enemy::damageTextUpdate(float deltaTime) {
-    for (auto& dt : damageTexts) {
-        dt.timer += deltaTime;
-        dt.position.y -= dt.speedY * deltaTime;  // move upward
+void Enemy::damageTextUpdate(float deltaTime, std::vector<DamageText>& damageTexts) {
 
-        float alpha = 1.0f - (dt.timer / dt.duration);
-        if (alpha < 0.0f) alpha = 0.0f;
-        dt.color.a = static_cast<unsigned char>(alpha * 255);
+    if (tookDamage) {
+        DamageText dt;
+        dt.position = {xPos, yPos - 20.0f};
+        dt.text = std::to_string(static_cast<int>(damageTaken));
+        dt.timer = 0.0f;
+        dt.duration = 1.5f;
+        dt.color = RED;
+        dt.speedY = 10.0f;
+
+        damageTexts.push_back(dt);
+        tookDamage = false;
     }
-
-    damageTexts.erase(
-        std::remove_if(damageTexts.begin(), damageTexts.end(),
-            [](const DamageText& dt) {
-                return dt.timer >= dt.duration;  // remove expired
-            }),
-        damageTexts.end()
-    );
 }

@@ -5,7 +5,12 @@ Skeleton::Skeleton(int startX, int startY, Texture& texture)
 
 }
 
-void Skeleton::update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer) {
+void Skeleton::update(float deltaTime, 
+        float& playerXPos, 
+        float& playerYPos, 
+        std::vector<std::vector<Tilemap::sTile>>& collisionLayer,
+        std::vector<DamageText>& damageTexts
+        ) {
     m_frameTimer += deltaTime;
     m_pathfindTimer += deltaTime;
 
@@ -15,7 +20,7 @@ void Skeleton::update(float deltaTime, float& playerXPos, float& playerYPos, std
     m_stateHandling(playerXPos, playerYPos, collisionLayer);
     m_stateCheck(deltaTime, moveY, moveX);
     updateAndCollide(moveX, moveY, collisionLayer);
-    damageTextUpdate(deltaTime);
+    damageTextUpdate(deltaTime, damageTexts);
 }
 
 /*

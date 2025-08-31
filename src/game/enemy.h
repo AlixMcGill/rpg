@@ -41,11 +41,27 @@ public:
 
     Rectangle tileSize;
 
+    struct DamageText {
+        Vector2 position;
+        std::string text;
+        float timer;
+        float duration;
+        Color color;
+        float speedY;
+    };
+
     Enemy(int startX, int startY, Texture& textrue);
-    virtual void update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer);
-    void draw();
+    virtual void update(float deltaTime,
+                        float& playerXPos, 
+                        float& playerYPos, 
+                        std::vector<std::vector<Tilemap::sTile>>& collisionLayer,
+                        std::vector<DamageText>& damageTexts
+                        );
+    void draw(std::vector<DamageText>& damageTexts);
     void setBoxCollider(float width, float height, float offsetX, float offsetY);
 
+    bool tookDamage = false;
+    float damageTaken;
     void takeDamage(float damage);
     bool isDead();
 
@@ -77,15 +93,6 @@ public:
     bool seenPlayer = false;
     Vector2 seenPlayerLast;
 
-    struct DamageText {
-        Vector2 position;
-        std::string text;
-        float timer;
-        float duration;
-        Color color;
-        float speedY;
-    };
-    std::vector<DamageText> damageTexts;
 
     std::vector<Vector2> path; // path for a* algorithm
 
@@ -106,7 +113,7 @@ public:
 
     // tells the renderer what tiles to render on the sprite sheet
     void animate(float startY, float endX);
-    void damageTextUpdate(float deltaTime);
+    void damageTextUpdate(float deltaTime, std::vector<DamageText>& damageTexts);
 
     // A* algorithm
     void computePath(int targetTileX, int targetTileY, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);

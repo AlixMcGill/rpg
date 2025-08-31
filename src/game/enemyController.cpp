@@ -28,15 +28,16 @@ void EnemyController::init(std::string map) {
 }
 void EnemyController::update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer) {
     for (auto& e : enemies) {
-        e->update(deltaTime, playerXPos, playerYPos, collisionLayer);
+        e->update(deltaTime, playerXPos, playerYPos, collisionLayer, damageTexts);
     }
 
+    m_updateDamageTexts(deltaTime);
     m_sortDrawOrder(playerYPos);
 }
 
 void EnemyController::drawBehindPlayer() {
     for (auto& e : behindPlayerEnemys) {
-            e->draw();
+            e->draw(damageTexts);
     }
 
     // Garbage collect any dead enemies
@@ -52,7 +53,7 @@ void EnemyController::drawBehindPlayer() {
 
 void EnemyController::drawFrontPlayer() {
     for (auto& e : frontPlayerEnemys) {
-            e->draw();
+            e->draw(damageTexts);
     }
 }
 
@@ -86,6 +87,26 @@ Texture EnemyController::m_loadTexture(const char* path) {
 
 void EnemyController::m_cleanEnemys() {
     enemies.clear();
+}
+
+void EnemyController::m_updateDamageTexts(float deltaTime) {
+    for (auto& dt : damageTexts) {
+        dt.timer += deltaTime;
+        dt.position.y -= dt.speedY * deltaTime;  // move upward
+
+        float alpha = 1.0f - (dt.timer / dt.duration);
+        if (alpha < 0.0f) alpha = 0.0f;
+        dt.color.a = static_cast<unsigned char>(alpha * 255);
+    }
+
+    damageTexts.erase(
+        std::remove_if(damageTexts.begin(), damageTexts.end(),
+            [](const Enemy::DamageText& dt) {
+                return dt.timer >= dt.duration;  // remove expired
+            }),
+        damageTexts.end()
+    );
+
 }
 
 // Enemy Spawing Methods

@@ -14,6 +14,8 @@ public:
 
     std::unordered_map<std::string, Texture> textures;
 
+    std::vector<Enemy::DamageText> damageTexts;
+
     void init(std::string map);
     void update(float deltaTime, float& playerXPos, float& playerYPos, std::vector<std::vector<Tilemap::sTile>>& collisionLayer);
     void drawBehindPlayer();
@@ -23,6 +25,7 @@ private:
     void m_sortDrawOrder(float& playerYPos);
     Texture m_loadTexture(const char* path);
     void m_cleanEnemys();
+    void m_updateDamageTexts(float deltaTime);
 
     // Enemy Spawning Function
     void m_spawnSkeleton(int x, int y, Texture& textrue);
