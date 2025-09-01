@@ -498,7 +498,11 @@ void Enemy::damageTextUpdate(float deltaTime, std::vector<DamageText>& damageTex
     if (tookDamage) {
         DamageText dt;
         dt.position = {xPos + (int)((std::rand() % 5) - 2), yPos - 20.0f};
-        dt.text = std::to_string(static_cast<int>(damageTaken));
+        if (damageTaken > 0.0f) {
+            dt.text = std::to_string(static_cast<int>(damageTaken));
+        } else {
+            dt.text = "Miss";
+        }
         dt.timer = 0.0f;
         dt.duration = 1.5f;
         dt.color = {255,0,72,255};
@@ -513,13 +517,13 @@ void Enemy::attackUpdate(Player& player) {
     if (canAttack) {
         float dist = distance(xPos, yPos, player.xPos, player.yPos);
         float damage = getMeleeDamage(dist);
-        std::cout << "Damaged Player: " << damage << std::endl;
+        //std::cout << "Damaged Player: " << damage << std::endl;
         player.damagePlayer(damage);
     }
 }
 
 float Enemy::getMeleeDamage(float dist) {
-    float maxRange = m_attackRange - 5.0f;
+    float maxRange = m_attackRange + 8.0f;
     float baseDamage = 3.0f;
 
     float distFactor = std::max(0.0f, 1.0f - (dist / maxRange));
@@ -527,11 +531,17 @@ float Enemy::getMeleeDamage(float dist) {
 
     float dam = (baseDamage + roll) * distFactor;
 
-    if (dam < baseDamage) {
+    std::cout << "Damage: " << dam << "Roll: " << roll << std::endl;
+    if (roll == 1 || dam < 1.0f) {
+        dam = 0;
+    }
+
+    return dam;
+    /*if (dam < baseDamage) {
         return baseDamage;
     } else {
         return dam;
-    }
+    }*/
 
 }
 

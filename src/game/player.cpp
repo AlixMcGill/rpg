@@ -47,7 +47,7 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
             m_playerTileY = 2;
             m_playerTileX++;
 
-            if (m_playerTileX > 8) {
+            if (m_playerTileX > 7) {
                 m_playerTileX = 0;
             }
         } else if (currentState == IDLE_UP) {
@@ -58,10 +58,10 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
                 m_playerTileX = 0;
             }
         } else if (currentState == IDLE_DOWN) {
-            m_playerTileY = 0;
+            m_playerTileY = 4;
             m_playerTileX++;
 
-            if (m_playerTileX > 1) {
+            if (m_playerTileX > 13) {
                 m_playerTileX = 0;
             }
         } else if (currentState == IDLE_RIGHT || currentState == IDLE_LEFT) {
@@ -202,13 +202,13 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
         m_playerTileX = 0;
         stamina -= 5.0f;
     } else if (!isAnimating) {
-        if ((vel.y != 0 || vel.x != 0) && mouseDir == "UP") {
+        if ((vel.y != 0 || vel.x != 0) && IsKeyDown(KEY_W)) {
             currentState = WALK_UP;
-        } else if ((vel.y != 0 || vel.x != 0) && mouseDir == "DOWN") {
+        } else if ((vel.y != 0 || vel.x != 0) && IsKeyDown(KEY_S)) {
             currentState = WALK_DOWN;
-        } else if ((vel.x != 0 || vel.y != 0) && mouseDir == "LEFT") {
+        } else if ((vel.x != 0 || vel.y != 0) && IsKeyDown(KEY_A)) {
             currentState = WALK_LEFT;
-        } else if ((vel.x != 0 || vel.y != 0) && mouseDir == "RIGHT") {
+        } else if ((vel.x != 0 || vel.y != 0) && IsKeyDown(KEY_D)) {
             currentState = WALK_RIGHT;
         } else if ((vel.x == 0 && vel.y == 0) && mouseDir == "UP") {
             currentState = IDLE_UP;
@@ -234,7 +234,9 @@ void Player::draw() {
     std::string mouseDir = m_getMouseDirection();
     Rectangle source = { (float)m_playerTileX * PLAYER_TILE_WIDTH, (float)m_playerTileY * PLAYER_TILE_HEIGHT, (float)PLAYER_TILE_WIDTH, (float)PLAYER_TILE_HEIGHT};
 
-    if (mouseDir == "LEFT") {
+    if ((mouseDir == "LEFT" && currentState != WALK_RIGHT &&
+        currentState != WALK_UP && currentState != WALK_DOWN) || 
+        currentState == WALK_LEFT) {
         source.x = (float)(m_playerTileX) * PLAYER_TILE_WIDTH; // right edge of current frame
         source.width = -(float)PLAYER_TILE_WIDTH;                  // flip horizontally
     } else {
@@ -305,7 +307,11 @@ void Player::damagePlayer(float damage) {
 
     DamageText dt;
     dt.position = {xPos + ((std::rand() % 11) - 5), yPos - 20.0f};
-    dt.text = std::to_string(static_cast<int>(damage));
+    if (damage > 0) {
+        dt.text = std::to_string(static_cast<int>(damage));
+    } else {
+        dt.text = "Miss";
+    }
     dt.timer = 0.0f;
     dt.duration = 1.5f;
     dt.color = WHITE;

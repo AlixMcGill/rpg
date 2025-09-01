@@ -7,7 +7,8 @@
 
 class Player : public Entity {
 public:
-    bool renderDebug = true;
+    bool renderDebug = false;
+
     float stamina;
     float health = 100.0f;
     float maxHealth = 100.0f;
