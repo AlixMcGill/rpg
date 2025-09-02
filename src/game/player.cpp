@@ -51,10 +51,10 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
                 m_playerTileX = 0;
             }
         } else if (currentState == IDLE_UP) {
-            m_playerTileY = 1;
+            m_playerTileY = 5;
             m_playerTileX++;
 
-            if (m_playerTileX > 1) {
+            if (m_playerTileX > 7) {
                 m_playerTileX = 0;
             }
         } else if (currentState == IDLE_DOWN) {
@@ -65,10 +65,10 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
                 m_playerTileX = 0;
             }
         } else if (currentState == IDLE_RIGHT || currentState == IDLE_LEFT) {
-            m_playerTileY = 2;
+            m_playerTileY = 6;
             m_playerTileX++;
 
-            if (m_playerTileX > 1) {
+            if (m_playerTileX > 7) {
                 m_playerTileX = 0;
             }
         }

@@ -17,6 +17,30 @@ void EnemyController::init(std::string map) {
         m_spawnSkeleton(30, 18, textures["Skeleton"]);
         m_spawnSkeleton(10, 38, textures["Skeleton"]);
         m_spawnSkeleton(10, 28, textures["Skeleton"]);
+        m_spawnSkeleton(10, 20, textures["Skeleton"]);
+        m_spawnSkeleton(10, 22, textures["Skeleton"]);
+        m_spawnSkeleton(10, 24, textures["Skeleton"]);
+        m_spawnSkeleton(10, 18, textures["Skeleton"]);
+        m_spawnSkeleton(30, 18, textures["Skeleton"]);
+        m_spawnSkeleton(10, 38, textures["Skeleton"]);
+        m_spawnSkeleton(10, 28, textures["Skeleton"]);
+        m_spawnSkeleton(10, 20, textures["Skeleton"]);
+        m_spawnSkeleton(10, 22, textures["Skeleton"]);
+        m_spawnSkeleton(10, 24, textures["Skeleton"]);
+        m_spawnSkeleton(10, 18, textures["Skeleton"]);
+        m_spawnSkeleton(30, 18, textures["Skeleton"]);
+        m_spawnSkeleton(10, 38, textures["Skeleton"]);
+        m_spawnSkeleton(10, 28, textures["Skeleton"]);
+        m_spawnSkeleton(10, 20, textures["Skeleton"]);
+        m_spawnSkeleton(10, 22, textures["Skeleton"]);
+        m_spawnSkeleton(10, 24, textures["Skeleton"]);
+        m_spawnSkeleton(10, 18, textures["Skeleton"]);
+        m_spawnSkeleton(30, 18, textures["Skeleton"]);
+        m_spawnSkeleton(10, 38, textures["Skeleton"]);
+        m_spawnSkeleton(10, 20, textures["Skeleton"]);
+        m_spawnSkeleton(10, 22, textures["Skeleton"]);
+        m_spawnSkeleton(10, 24, textures["Skeleton"]);
+        m_spawnSkeleton(10, 18, textures["Skeleton"]);
     }
 }
 void EnemyController::update(float deltaTime, float& playerXPos, float& playerYPos, Player& player, std::vector<std::vector<Tilemap::sTile>>& collisionLayer) {

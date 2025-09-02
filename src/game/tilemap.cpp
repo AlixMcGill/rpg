@@ -120,7 +120,7 @@ void Tilemap::initCamera() {
     camera.target = (Vector2){ 0, 0 };
     camera.offset = (Vector2){ (float)windowWidth / 2, (float)windowHeight / 2};
     camera.rotation = 0.0f;
-    camera.zoom = 3.0f;
+    camera.zoom = 2.5f;
 }
 
 void Tilemap::cameraZoom() {
