@@ -86,12 +86,11 @@ void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTil
                 m_updateAttack(ATTACK_DOWN, enemies);
 
             } else if (currentState == ATTACK_UP) {
-                m_playerTileY = 3;
+                m_playerTileY = 7;
                 m_playerTileX++;
 
-                if (m_playerTileX > 4) {
+                if (m_playerTileX == 4) {
                     isAnimating = false;
-                    m_playerTileX = 3;
                 }
 
                 m_updateAttack(ATTACK_UP, enemies);
@@ -286,10 +285,10 @@ bool Player::isColliding(const Rectangle& playerBounds, const std::vector<std::v
     for (int y = startY; y <= endY; y++) {
         for (int x = startX; x <= endX; x++) {
             // check if in bounds
-            if (y < 0 || y >= (int)worldCollisionLayer.size() ||
+            /*if (y < 0 || y >= (int)worldCollisionLayer.size() ||
                 x < 0 || x >= (int)worldCollisionLayer.size()) {
                 continue; // Ignore tiles out of bounds
-            }
+            }*/
 
             const Tilemap::sTile& tile = worldCollisionLayer[y][x];
 
@@ -336,11 +335,11 @@ void Player::m_loadPlayerTexture(const char* imgPath) {
 }
 
 Rectangle Player::m_getCollisionBounds(float futureX, float futureY) const {
-    float colliderWidth = 4;
-    float colliderHeight = 4;
+    float colliderWidth = 12;
+    float colliderHeight = 7;
 
     float offsetX = -(colliderWidth / 2.0f);
-    float offsetY = (colliderHeight) / 2.0f;
+    float offsetY = (colliderHeight + 8) / 2.0f;
 
     return {futureX + offsetX, futureY + offsetY, colliderWidth, colliderHeight};
 }

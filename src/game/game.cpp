@@ -5,16 +5,16 @@ void Game::init() {
     std::cout << "Game class init" << std::endl;
     std::srand(static_cast<unsigned>(std::time(nullptr)));
     InitAudioDevice();
-    m_tilemap.loadTexture("assets/Dungeon_Tileset-2.png");
-    m_tilemap.loadCSV("assets/maps/rpgMainMap_Tile Layer 1.csv");
-    m_tilemap.loadCSVAssetLayer("assets/maps/rpgMainMap_assets.csv");
-    m_tilemap.loadCSVCollisionLayer("assets/maps/rpgMainMap_coll.csv");
+    m_tilemap.loadTexture("assets/OverworldHandTileset.png");
+    m_tilemap.loadCSV("assets/maps/testMap/rpgmaptest_Tile Layer 1.csv");
+    m_tilemap.loadCSVAssetLayer("assets/maps/testMap/rpgmaptest_asset_Layer.csv");
+    m_tilemap.loadCSVCollisionLayer("assets/maps/testMap/rpgmaptest_coll_Layer.csv");
     m_tilemap.initCamera();
 
     player.init();
     m_tilemap.updateCameraTarget(player.xPos, player.yPos);
 
-    m_enemyController.init("Overworld_Map");
+    m_enemyController.init("Test_Map");
     //skely.init(20, 10, "assets/enemy/Skeleton.png");
 }
 

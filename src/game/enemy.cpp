@@ -186,10 +186,10 @@ bool Enemy::isColliding(const Rectangle& bounds, const std::vector<std::vector<T
     for (int y = startY; y <= endY; y++) {
         for (int x = startX; x <= endX; x++) {
             // check if in bounds
-            if (y < 0 || y >= (int)worldCollisionLayer.size() ||
+            /*if (y < 0 || y >= (int)worldCollisionLayer.size() ||
                 x < 0 || x >= (int)worldCollisionLayer.size()) {
                 continue; // Ignore tiles out of bounds
-            }
+            }*/
 
             const Tilemap::sTile& tile = worldCollisionLayer[y][x];
 
@@ -531,7 +531,7 @@ float Enemy::getMeleeDamage(float dist) {
 
     float dam = (baseDamage + roll) * distFactor;
 
-    std::cout << "Damage: " << dam << "Roll: " << roll << std::endl;
+    //std::cout << "Damage: " << dam << "Roll: " << roll << std::endl;
     if (roll == 1 || dam < 1.0f) {
         dam = 0;
     }

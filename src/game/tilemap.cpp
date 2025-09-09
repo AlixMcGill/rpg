@@ -113,6 +113,10 @@ void Tilemap::renderMap() {
             DrawTexturePro(textures[TEXTURE_TILEMAP], source, dest, origin, 0.0f, WHITE);
         }
     }
+
+    if (debug) {
+        m_renderDebugColl(startX, startY, endX, endY);
+    }
 }
 
 void Tilemap::initCamera() {
@@ -140,6 +144,23 @@ void Tilemap::updateCameraTarget(float x, float y) {
     camera.target = (Vector2){ x, y };
     cameraTarget.x = x;
     cameraTarget.y = y;
+}
+
+void Tilemap::m_renderDebugColl(int startX, int startY, int endX, int endY) {
+    for (int y = startY; y < endY; y++) { // Asset layer for below player
+        for (int x = startX; x < endX; x++) {
+
+            sTile& tile = worldCollisionLayer[y][x];
+            if (tile.id == -1) continue;
+
+            int srcX = x * TILE_WIDTH;
+            int srcY = y * TILE_HEIGHT;
+
+            Rectangle source = { (float)srcX, (float)srcY, (float)TILE_WIDTH, (float)TILE_HEIGHT};
+            DrawRectangleLinesEx(source, 1.0f, BLUE);
+        }
+    }
+
 }
 
 void Tilemap::m_loadCSV(const std::string& filename, std::vector<std::vector<sTile>>& loadPath) {

@@ -6,6 +6,7 @@
 
 class Tilemap {
 public:
+    bool debug = false;
     struct sTile {
         int x;
         int y;
@@ -35,5 +36,7 @@ private:
     };
 
     void m_loadCSV(const std::string& filename, std::vector<std::vector<sTile>>& loadPath);
+
+    void m_renderDebugColl(int startX, int startY, int endX, int endY);
 
 };
