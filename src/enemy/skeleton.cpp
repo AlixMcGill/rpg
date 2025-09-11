@@ -21,7 +21,7 @@ void Skeleton::update(float deltaTime,
 
     m_stateHandling(playerXPos, playerYPos, collisionLayer);
     m_stateCheck(deltaTime, moveY, moveX, player);
-    updateAndCollide(moveX, moveY, collisionLayer);
+    updateAndCollide(moveX, moveY, collisionLayer, deltaTime);
     damageTextUpdate(deltaTime, damageTexts);
 }
 

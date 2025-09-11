@@ -61,14 +61,17 @@ void EnemyController::update(float deltaTime, float& playerXPos, float& playerYP
         e->update(deltaTime, playerXPos, playerYPos, collisionLayer, damageTexts, player);
     }
 
+    for (size_t i = 0; i < enemies.size(); ++i) {
+        for (size_t j = i + 1; j < enemies.size(); ++j) {
+            if (enemies[i]->isCollidingWithEnemy(*enemies[j])) {
+                enemies[i]->resolveEnemyCollision(*enemies[j]);
+            }
+        }
+    }
+
+
     m_updateDamageTexts(deltaTime);
     m_sortDrawOrder(playerYPos);
-}
-
-void EnemyController::drawBehindPlayer() {
-    for (auto& e : behindPlayerEnemys) {
-            e->draw(damageTexts);
-    }
 
     // Garbage collect any dead enemies
     enemies.erase(
@@ -79,6 +82,12 @@ void EnemyController::drawBehindPlayer() {
         ),
         enemies.end()
     );
+}
+
+void EnemyController::drawBehindPlayer() {
+    for (auto& e : behindPlayerEnemys) {
+            e->draw(damageTexts);
+    }
 }
 
 void EnemyController::drawFrontPlayer() {

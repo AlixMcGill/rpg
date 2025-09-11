@@ -75,7 +75,7 @@ public:
     float m_defaultFrameTime = 0.12f;
 
     float m_pathfindTimer = 0.0f;
-    float m_pathfindTime = 0.1f;
+    float m_pathfindTime = 0.01f;
 
     float m_attackPathfindTime = 0.1f;
     float m_defaultPathfindTime = 0.1f;
@@ -85,7 +85,7 @@ public:
     float attackResetTime =  2.0f;
 
     float m_speed = 80.0f; // Max move speed
-    float m_moveSpeed = 50.0f;
+    float m_moveSpeed = 3.0f; // 50
 
     float m_playerDistance = 130.0f;
     float m_attackRange = 25.0f;
@@ -93,7 +93,6 @@ public:
 
     bool seenPlayer = false;
     Vector2 seenPlayerLast;
-
 
     std::vector<Vector2> path; // path for a* algorithm
 
@@ -112,7 +111,11 @@ public:
     Rectangle getHitboxbounds(float futureX, float futureY) const;
     bool isColliding(const Rectangle& bounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
 
-    void updateAndCollide(float& moveX, float& moveY, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
+    void updateAndCollide(float& moveX, float& moveY, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer, float deltaTime);
+
+    // Colliding With other enemies
+    bool isCollidingWithEnemy(const Enemy& other) const;
+    void resolveEnemyCollision(Enemy& other);
 
     // Render stuff
     //

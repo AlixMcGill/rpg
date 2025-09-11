@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <iostream>
+#include <ostream>
 #include <raylib.h>
 #include <string>
 
@@ -13,7 +14,7 @@ Enemy::Enemy(int startX, int startY, Texture& textrue)
     m_enemyTileX = 0;
     m_enemyTileY = 0;
     currentState = IDLE_DOWN;
-    setBoxCollider(2.0f, 2.0f, -1.0f, 2.0f);
+    setBoxCollider(4.0f, 6.0f, -2.0f, -1.0f);
     setHitbox(16.0f, 20.0f, -8.0f, -10.0f);
     tileSize.width = 32;
     tileSize.height = 32;
@@ -33,7 +34,7 @@ void Enemy::update(float deltaTime,
 
     m_stateHandling(playerXPos, playerYPos, collisionLayer);
     m_stateCheck(deltaTime, moveY, moveX, player);
-    updateAndCollide(moveX, moveY, collisionLayer);
+    updateAndCollide(moveX, moveY, collisionLayer, deltaTime);
     damageTextUpdate(deltaTime, damageTexts);
 }
 
@@ -60,6 +61,7 @@ void Enemy::draw(std::vector<DamageText>& damageTexts ) {
         DrawText(dt.text.c_str(), (int)(dt.position.x), (int)(dt.position.y), -10, dt.color);
     }
 
+
     if (renderDebug == true) {
     // draw the players collider bounds
         Rectangle collider = m_getCollisionBounds(xPos, yPos);
@@ -70,6 +72,7 @@ void Enemy::draw(std::vector<DamageText>& damageTexts ) {
 
         debugPathDraw(); // Draws pathfinding 
         debugSeePlayerDraw();
+        DrawRectangleLines(xPos, yPos, 2, 2, YELLOW);
     }
 }
 
@@ -214,17 +217,31 @@ void Enemy::animate(float startY, float endX) {
     }
 }
 
-void Enemy::updateAndCollide(float& moveX, float& moveY, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+void Enemy::updateAndCollide(float& moveX, float& moveY, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer, float deltaTime) {
+    int xTile = static_cast<int>(std::floor((xPos /*- TILE_WIDTH / 2.0f*/) / TILE_WIDTH));
+    int yTile = static_cast<int>(std::floor((yPos /*- TILE_HEIGHT / 2.0f*/) / TILE_HEIGHT));
+
+    float xTileCenter = xTile * TILE_WIDTH + (static_cast<float>(TILE_WIDTH) / 2.0f);
+    float yTileCenter = yTile * TILE_HEIGHT + (static_cast<float>(TILE_HEIGHT) / 2.0f);
+
+    float lerpSpeed = 4.0f;
+
+    // collision handling
     Rectangle futureX = m_getCollisionBounds(xPos + moveX, yPos);
     if (!isColliding(futureX, worldCollisionLayer)) { 
         xPos += moveX;
+        if (currentState == WALK_UP || currentState == WALK_DOWN) {
+            xPos = lerpDelta(xPos, xTileCenter, deltaTime, lerpSpeed);
+        }
     }
 
     Rectangle futureY = m_getCollisionBounds(xPos, yPos + moveY);
     if (!isColliding(futureY, worldCollisionLayer)) {
         yPos += moveY;
+        if (currentState == WALK_RIGHT || currentState == WALK_LEFT) {
+            yPos = lerpDelta(yPos, yTileCenter, deltaTime, lerpSpeed);
+        }
     }
-
 }
 
 void Enemy::m_stateHandling(float& playerXPos, float& playerYPos, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
@@ -312,25 +329,25 @@ void Enemy::m_stateCheck(float& deltaTime, float& moveY, float& moveX, Player& p
             break;
         case WALK_UP:
             currentState = WALK_UP;
-            moveY += -m_moveSpeed * deltaTime;
+            moveY += TILE_HEIGHT * deltaTime * -m_moveSpeed;
             animate(2.0f, 5.0f);
             canAttack = true;
             break;
         case WALK_DOWN:
             currentState = WALK_DOWN;
-            moveY += m_moveSpeed * deltaTime;
+            moveY += TILE_HEIGHT * deltaTime * m_moveSpeed;
             animate(3.0f, 5.0f);
             canAttack = true;
             break;
         case WALK_LEFT:
             currentState = WALK_LEFT;
-            moveX += -m_moveSpeed * deltaTime;
+            moveX += TILE_WIDTH * deltaTime * -m_moveSpeed;
             animate(4.0f, 5.0f);
             canAttack = true;
             break;
         case WALK_RIGHT:
             currentState = WALK_RIGHT;
-            moveX += m_moveSpeed * deltaTime;
+            moveX += TILE_WIDTH * deltaTime * m_moveSpeed;
             animate(4.0f, 5.0f);
             canAttack = true;
             break;
@@ -476,7 +493,7 @@ void Enemy::debugSeePlayerDraw() {
 // Draw detection radius
     Vector2 center = { xPos + m_collisionRect.width / 2, yPos + m_collisionRect.height / 2 };
     DrawCircleLines(center.x, center.y, m_playerDistance, RED); // outline
-    DrawCircle(center.x, center.y, 2.0f, YELLOW); // enemy center
+    //DrawCircle(center.x, center.y, 2.0f, YELLOW); // enemy center
 }
 
 void Enemy::takeDamage(float damage) {
@@ -551,5 +568,43 @@ void Enemy::attackTimer(float deltaTime) {
     if (attackResetTimer >= attackResetTime) {
         attackResetTimer = 0.0f;
         canAttack = true;
+    }
+}
+
+bool Enemy::isCollidingWithEnemy(const Enemy& other) const {
+    // Compute world-space AABB for this enemy
+    float leftA   = xPos + m_collisionOffset.x - m_collisionRect.width  / 2.0f;
+    float topA    = yPos + m_collisionOffset.y - m_collisionRect.height / 2.0f;
+    float rightA  = leftA + m_collisionRect.width;
+    float bottomA = topA  + m_collisionRect.height;
+
+    // Compute world-space AABB for other enemy
+    float leftB   = other.xPos + other.m_collisionOffset.x - other.m_collisionRect.width  / 2.0f;
+    float topB    = other.yPos + other.m_collisionOffset.y - other.m_collisionRect.height / 2.0f;
+    float rightB  = leftB + other.m_collisionRect.width;
+    float bottomB = topB  + other.m_collisionRect.height;
+
+    return (leftA < rightB && rightA > leftB &&
+            topA  < bottomB && bottomA > topB);
+}
+
+void Enemy::resolveEnemyCollision(Enemy& other) {
+    float dx = xPos - other.xPos;
+    float dy = yPos - other.yPos;
+
+    float overlapX = (m_collisionRect.width + other.m_collisionRect.width)/2 - std::abs(dx);
+    float overlapY = (m_collisionRect.height + other.m_collisionRect.height)/2 - std::abs(dy);
+
+    if (overlapX > 0 && overlapY > 0) {
+        // Push along the smaller overlap axis
+        if (overlapX < overlapY) {
+            float push = overlapX / 2.0f;
+            if (dx > 0) { xPos += push; other.xPos -= push; }
+            else         { xPos -= push; other.xPos += push; }
+        } else {
+            float push = overlapY / 2.0f;
+            if (dy > 0) { yPos += push; other.yPos -= push; }
+            else         { yPos -= push; other.yPos += push; }
+        }
     }
 }
