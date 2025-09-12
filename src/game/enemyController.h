@@ -27,6 +27,7 @@ private:
     Texture m_loadTexture(const char* path);
     void m_cleanEnemys();
     void m_updateDamageTexts(float deltaTime);
+    void m_unload();
 
     // Enemy Spawning Function
     void m_spawnSkeleton(int x, int y, Texture& textrue);

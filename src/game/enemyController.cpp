@@ -5,7 +5,7 @@
 
 void EnemyController::init(std::string map) {
     if (map == "Overworld_Map") {
-        enemies.clear();
+        m_unload();
 
         // init the textures to be used in level
         textures["Skeleton"] = m_loadTexture("assets/enemy/Skeleton.png");
@@ -43,7 +43,7 @@ void EnemyController::init(std::string map) {
         m_spawnSkeleton(10, 18, textures["Skeleton"]);
     }
     else if (map == "Test_Map") {
-        enemies.clear();
+        m_unload();
 
         // init the textures to be used in level
         textures["Skeleton"] = m_loadTexture("assets/enemy/Skeleton.png");
@@ -102,6 +102,8 @@ void EnemyController::destroy() {
     }
 }
 
+// Private Functions
+
 void EnemyController::m_sortDrawOrder(float& playerYPos) {
     float centerPlayerY = playerYPos + 16.0f;
 
@@ -146,6 +148,21 @@ void EnemyController::m_updateDamageTexts(float deltaTime) {
         damageTexts.end()
     );
 
+}
+// unLoads all textrues and clears enemy arrays
+void EnemyController::m_unload() {
+
+    // Unload textrues
+    for (auto& [name, tex] : textures) {
+        UnloadTexture(tex);
+    }
+
+    // clear vectors
+    textures.clear();
+    enemies.clear();
+    behindPlayerEnemys.clear();
+    frontPlayerEnemys.clear();
+    damageTexts.clear();
 }
 
 // Enemy Spawing Methods
