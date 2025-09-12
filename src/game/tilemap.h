@@ -1,17 +1,27 @@
 #pragma once
 #include "../utils/project.h"
 #include <raylib.h>
+#include <vector>
 
 #define MAX_TEXTURES 1
 
 class Tilemap {
 public:
+    virtual ~Tilemap();
+
     bool debug = false;
-    struct sTile {
-        int x;
-        int y;
-        int id;
-    };
+
+    virtual void load(float playerXPos, float PlayerYPos) = 0;
+    virtual void unload() {unloadTilemap();}
+    virtual void update(float deltaTime, float playerXPos, float playerYPos) {}
+    virtual void draw() {renderMap();}
+
+    Camera2D& getCamera() {return camera;}
+    const Camera2D& getCamera() const {return camera;}
+    std::vector<std::vector<sTile>>& getWorldCollisionLayer() {return worldCollisionLayer;}
+    const std::vector<std::vector<sTile>>& getWorldCollisionLayer() const {return worldCollisionLayer;}
+
+protected:
     Texture2D textures[MAX_TEXTURES];
     std::vector<std::vector<sTile>> world;
     std::vector<std::vector<sTile>> worldCollisionLayer;
@@ -30,6 +40,7 @@ public:
     void initCamera();
     void cameraZoom();
     void updateCameraTarget(float x, float y);
+    void unloadTilemap();
 private:
     enum m_textrueAsset {
         TEXTURE_TILEMAP = 0

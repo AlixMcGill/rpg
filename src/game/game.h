@@ -5,6 +5,7 @@
 #include "tilemap.h"
 #include "player.h"
 #include "enemyController.h"
+#include "mapManager.h"
 
 class Game {
 public:
@@ -14,9 +15,10 @@ public:
     void destroy();
 
 private:
-    Tilemap m_tilemap;
+    //Tilemap m_tilemap;
     DevStats dev;
     Player player;
     EnemyController m_enemyController;
+    MapManager m_mapManager;
     //Enemy skely;
 };

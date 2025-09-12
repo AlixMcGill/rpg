@@ -16,7 +16,7 @@ void Player::init() {
     health = maxHealth;
 }
 
-void Player::update(float deltaTime, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer,
+void Player::update(float deltaTime, const std::vector<std::vector<sTile>>& worldCollisionLayer,
                     std::vector<std::unique_ptr<Enemy>>& enemies) {
     m_frameTimer += deltaTime;
     if (m_frameTimer >= m_frameTime) { // Handles animations based off a timer
@@ -274,7 +274,7 @@ void Player::destroy() {
     UnloadTexture(m_playerTexture);
 }
 
-bool Player::isColliding(const Rectangle& playerBounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+bool Player::isColliding(const Rectangle& playerBounds, const std::vector<std::vector<sTile>>& worldCollisionLayer) {
 
     // Get Tiles player is overlapping
     int startX = playerBounds.x / TILE_WIDTH;
@@ -290,7 +290,7 @@ bool Player::isColliding(const Rectangle& playerBounds, const std::vector<std::v
                 continue; // Ignore tiles out of bounds
             }*/
 
-            const Tilemap::sTile& tile = worldCollisionLayer[y][x];
+            const sTile& tile = worldCollisionLayer[y][x];
 
             if (tile.id != -1) {
                 return true;

@@ -12,7 +12,7 @@ public:
     Vector2 accel;
 
     Rectangle getCollisionBounds(float futureX, float futureY) const;
-    bool isColliding(const Rectangle& bounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
+    bool isColliding(const Rectangle& bounds, const std::vector<std::vector<sTile>>& worldCollisionLayer);
 
 private:
 };

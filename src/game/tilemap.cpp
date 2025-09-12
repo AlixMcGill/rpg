@@ -2,6 +2,10 @@
 #include <raylib.h>
 #include <string>
 
+Tilemap::~Tilemap() {
+    unloadTilemap();
+}
+
 void Tilemap::loadTexture(const char* imgPath) {
     std::cout << "Loading Texture" << std::endl;
     Image image = LoadImage(imgPath);
@@ -9,7 +13,8 @@ void Tilemap::loadTexture(const char* imgPath) {
     UnloadImage(image);
 }
 
-void Tilemap::destroyTextures() { for (int i = 0; i < MAX_TEXTURES; i++) {
+void Tilemap::destroyTextures() { 
+    for (int i = 0; i < MAX_TEXTURES; i++) {
         UnloadTexture(textures[i]);
     }
 }
@@ -144,6 +149,15 @@ void Tilemap::updateCameraTarget(float x, float y) {
     camera.target = (Vector2){ x, y };
     cameraTarget.x = x;
     cameraTarget.y = y;
+}
+
+void Tilemap::unloadTilemap() {
+    destroyTextures();
+    world.clear();
+    worldCollisionLayer.clear();
+    worldAssetLayer.clear();
+    mapWidth = 0;
+    mapHeight = 0;
 }
 
 void Tilemap::m_renderDebugColl(int startX, int startY, int endX, int endY) {

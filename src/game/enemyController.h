@@ -18,7 +18,7 @@ public:
     std::vector<DamageText> damageTexts;
 
     void init(std::string map);
-    void update(float deltaTime, float& playerXPos, float& playerYPos, Player& player, std::vector<std::vector<Tilemap::sTile>>& collisionLayer);
+    void update(float deltaTime, float& playerXPos, float& playerYPos, Player& player, std::vector<std::vector<sTile>>& collisionLayer);
     void drawBehindPlayer();
     void drawFrontPlayer();
     void destroy(); 

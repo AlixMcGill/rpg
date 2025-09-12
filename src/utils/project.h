@@ -35,6 +35,12 @@ struct DamageText {
     float speedY;
 };
 
+struct sTile {
+    int x;
+    int y;
+    int id;
+};
+
 void setCollider(float width, float height, float offsetX, float offsetY, Rectangle& colliderRect);
 
 // Dice rolls

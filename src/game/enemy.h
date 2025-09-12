@@ -48,7 +48,7 @@ public:
     virtual void update(float deltaTime,
                         float& playerXPos, 
                         float& playerYPos, 
-                        std::vector<std::vector<Tilemap::sTile>>& collisionLayer,
+                        std::vector<std::vector<sTile>>& collisionLayer,
                         std::vector<DamageText>& damageTexts,
                         Player& player
                         );
@@ -101,7 +101,7 @@ public:
     void m_moveTowardsPlayer(float& playerXPos, float& playerYPos);
     bool m_isPlayerNear(float& playerXPos, float& playerYPos);
     bool m_isInAttackRange(float& playerXPos, float& playerYPos);
-    bool canSeePlayer(float& playerXPos, float& playerYPos, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
+    bool canSeePlayer(float& playerXPos, float& playerYPos, const std::vector<std::vector<sTile>>& worldCollisionLayer);
     std::string m_whereIsPlayer(const float& playerXPos, const float& playerYPos);
     void m_arrivedLastSeen();
 
@@ -109,9 +109,9 @@ public:
     void setHitbox(float width, float height, float offsetX, float offsetY);
     Rectangle m_getCollisionBounds(float futureX, float futureY) const;
     Rectangle getHitboxbounds(float futureX, float futureY) const;
-    bool isColliding(const Rectangle& bounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
+    bool isColliding(const Rectangle& bounds, const std::vector<std::vector<sTile>>& worldCollisionLayer);
 
-    void updateAndCollide(float& moveX, float& moveY, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer, float deltaTime);
+    void updateAndCollide(float& moveX, float& moveY, const std::vector<std::vector<sTile>>& worldCollisionLayer, float deltaTime);
 
     // Colliding With other enemies
     bool isCollidingWithEnemy(const Enemy& other) const;
@@ -128,8 +128,8 @@ public:
     float getMeleeDamage(float distance);
 
     // A* algorithm
-    void computePath(int targetTileX, int targetTileY, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
-    void followPath(float deltaTime, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
+    void computePath(int targetTileX, int targetTileY, const std::vector<std::vector<sTile>>& worldCollisionLayer);
+    void followPath(float deltaTime, const std::vector<std::vector<sTile>>& worldCollisionLayer);
 
     // debug methods
     void debugPathDraw();
@@ -138,6 +138,6 @@ public:
     // Timer stuff
     void attackTimer(float delatTime);
 protected:
-    virtual void m_stateHandling(float& playerXPos, float& playerYPos, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
+    virtual void m_stateHandling(float& playerXPos, float& playerYPos, const std::vector<std::vector<sTile>>& worldCollisionLayer);
     virtual void m_stateCheck(float& deltaTime, float& moveY, float& moveX, Player& player);
 };

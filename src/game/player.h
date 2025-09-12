@@ -42,12 +42,12 @@ public:
 
     void init();
     void update(float deltaTime,
-                const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer,
+                const std::vector<std::vector<sTile>>& worldCollisionLayer,
                 std::vector<std::unique_ptr<Enemy>>& enemies);
     void draw();
     void destroy();
 
-    bool isColliding(const Rectangle& playerBounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer);
+    bool isColliding(const Rectangle& playerBounds, const std::vector<std::vector<sTile>>& worldCollisionLayer);
 
     void damagePlayer(float damage);
 private:

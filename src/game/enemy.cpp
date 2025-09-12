@@ -22,7 +22,7 @@ Enemy::Enemy(int startX, int startY, Texture& textrue)
 
 void Enemy::update(float deltaTime, 
                 float& playerXPos, float& playerYPos, 
-                std::vector<std::vector<Tilemap::sTile>>& collisionLayer,
+                std::vector<std::vector<sTile>>& collisionLayer,
                 std::vector<DamageText>& damageTexts,
                 Player& player) {
     m_frameTimer += deltaTime;
@@ -112,7 +112,7 @@ bool Enemy::m_isInAttackRange(float& playerXPos, float& playerYPos) {
 
 }
 
-bool Enemy::canSeePlayer(float& playerXPos, float& playerYPos, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+bool Enemy::canSeePlayer(float& playerXPos, float& playerYPos, const std::vector<std::vector<sTile>>& worldCollisionLayer) {
 
     // start and end position for ray
     float startX = xPos + m_collisionRect.width / 2;
@@ -178,7 +178,7 @@ Rectangle Enemy::getHitboxbounds(float futureX, float futureY) const {
     return {futureX + hitBox.x, futureY + hitBox.y, hitBox.width, hitBox.height};
 }
 
-bool Enemy::isColliding(const Rectangle& bounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+bool Enemy::isColliding(const Rectangle& bounds, const std::vector<std::vector<sTile>>& worldCollisionLayer) {
 
     // Get Tiles player is overlapping
     int startX = bounds.x / TILE_WIDTH;
@@ -194,7 +194,7 @@ bool Enemy::isColliding(const Rectangle& bounds, const std::vector<std::vector<T
                 continue; // Ignore tiles out of bounds
             }*/
 
-            const Tilemap::sTile& tile = worldCollisionLayer[y][x];
+            const sTile& tile = worldCollisionLayer[y][x];
 
             if (tile.id != -1) {
                 return true;
@@ -217,7 +217,7 @@ void Enemy::animate(float startY, float endX) {
     }
 }
 
-void Enemy::updateAndCollide(float& moveX, float& moveY, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer, float deltaTime) {
+void Enemy::updateAndCollide(float& moveX, float& moveY, const std::vector<std::vector<sTile>>& worldCollisionLayer, float deltaTime) {
     int xTile = static_cast<int>(std::floor((xPos /*- TILE_WIDTH / 2.0f*/) / TILE_WIDTH));
     int yTile = static_cast<int>(std::floor((yPos /*- TILE_HEIGHT / 2.0f*/) / TILE_HEIGHT));
 
@@ -244,7 +244,7 @@ void Enemy::updateAndCollide(float& moveX, float& moveY, const std::vector<std::
     }
 }
 
-void Enemy::m_stateHandling(float& playerXPos, float& playerYPos, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+void Enemy::m_stateHandling(float& playerXPos, float& playerYPos, const std::vector<std::vector<sTile>>& worldCollisionLayer) {
     if (m_pathfindTimer >= m_pathfindTime) {
         if ((m_isPlayerNear(playerXPos, playerYPos) && !m_isInAttackRange(playerXPos, playerYPos) &&
             canSeePlayer(playerXPos, playerYPos, worldCollisionLayer)) || seenPlayer) { 
@@ -393,7 +393,7 @@ void Enemy::m_arrivedLastSeen() {
     }
 }
 
-void Enemy::computePath(int targetTileX, int targetTileY, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+void Enemy::computePath(int targetTileX, int targetTileY, const std::vector<std::vector<sTile>>& worldCollisionLayer) {
     int startX = (int)(xPos / TILE_WIDTH);
     int startY = (int)(yPos / TILE_HEIGHT);
 
@@ -478,7 +478,7 @@ void Enemy::computePath(int targetTileX, int targetTileY, const std::vector<std:
             delete n;
 }
 
-void Enemy::followPath(float deltaTime, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+void Enemy::followPath(float deltaTime, const std::vector<std::vector<sTile>>& worldCollisionLayer) {
 
 }
 

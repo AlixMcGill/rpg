@@ -56,7 +56,7 @@ void EnemyController::init(std::string map) {
 
     }
 }
-void EnemyController::update(float deltaTime, float& playerXPos, float& playerYPos, Player& player, std::vector<std::vector<Tilemap::sTile>>& collisionLayer) {
+void EnemyController::update(float deltaTime, float& playerXPos, float& playerYPos, Player& player, std::vector<std::vector<sTile>>& collisionLayer) {
     for (auto& e : enemies) {
         e->update(deltaTime, playerXPos, playerYPos, collisionLayer, damageTexts, player);
     }

@@ -8,7 +8,7 @@ Skeleton::Skeleton(int startX, int startY, Texture& texture)
 void Skeleton::update(float deltaTime, 
         float& playerXPos, 
         float& playerYPos, 
-        std::vector<std::vector<Tilemap::sTile>>& collisionLayer,
+        std::vector<std::vector<sTile>>& collisionLayer,
         std::vector<DamageText>& damageTexts,
         Player& player
         ) {
@@ -26,7 +26,7 @@ void Skeleton::update(float deltaTime,
 }
 
 /*
-void Skeleton::m_stateHandling(float& playerXPos, float& playerYPos, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+void Skeleton::m_stateHandling(float& playerXPos, float& playerYPos, const std::vector<std::vector<sTile>>& worldCollisionLayer) {
     if (m_pathfindTimer >= m_pathfindTime) {
         if (m_isPlayerNear(playerXPos, playerYPos) && !m_isInAttackRange(playerXPos, playerYPos) &&
             canSeePlayer(playerXPos, playerYPos, worldCollisionLayer)) { 

@@ -10,7 +10,7 @@ Rectangle Entity::getCollisionBounds(float futureX, float futureY) const {
     return {futureX + offsetX, futureY + offsetY, colliderWidth, colliderHeight};
 }
 
-bool Entity::isColliding(const Rectangle& bounds, const std::vector<std::vector<Tilemap::sTile>>& worldCollisionLayer) {
+bool Entity::isColliding(const Rectangle& bounds, const std::vector<std::vector<sTile>>& worldCollisionLayer) {
 
     // Get Tiles player is overlapping
     int startX = bounds.x / TILE_WIDTH;
@@ -26,7 +26,7 @@ bool Entity::isColliding(const Rectangle& bounds, const std::vector<std::vector<
                 continue; // Ignore tiles out of bounds
             }
 
-            const Tilemap::sTile& tile = worldCollisionLayer[y][x];
+            const sTile& tile = worldCollisionLayer[y][x];
 
             if (tile.id != -1) {
                 return true;
