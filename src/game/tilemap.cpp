@@ -21,7 +21,11 @@ void Tilemap::destroyTextures() {
 
 // Very important that collision map is loaded after regular map
 void Tilemap::loadCSVCollisionLayer(const std::string& filename) {
+    std::cout << "WorldY: " << (int)worldCollisionLayer.size() << 
+        " WorldX: " << (int)worldCollisionLayer.size() << std::endl;
     m_loadCSV(filename, worldCollisionLayer);
+    std::cout << "WorldY: " << (int)worldCollisionLayer.size() << 
+        " WorldX: " << (int)worldCollisionLayer.size() << std::endl;
 }
 
 void Tilemap::loadCSVAssetLayer(const std::string& filename) {
@@ -59,6 +63,9 @@ void Tilemap::loadCSV(const std::string& filename) {
 
     mapWidth = width;
     mapHeight = height;
+
+    std::cout << "Loading: " << filename << std::endl;
+    std::cout << mapHeight << " " << mapWidth << std::endl;
 
     world.resize(mapHeight, std::vector<sTile>(mapWidth));
 
@@ -210,7 +217,10 @@ void Tilemap::m_loadCSV(const std::string& filename, std::vector<std::vector<sTi
         std::cout << "[ERROR]: The collision map w and height are invalid" << std::endl;
     }
 
-    loadPath.resize(mapHeight, std::vector<sTile>(mapWidth));
+    std::cout << "Loading: " << filename << std::endl;
+    std::cout << mapHeight << " " << mapWidth << std::endl;
+
+    loadPath.assign(mapHeight, std::vector<sTile>(mapWidth));
 
     for (int y = 0; y < mapHeight; y++) {
         for (int x = 0; x < mapWidth; x++) {

@@ -8,8 +8,10 @@ void MapManager::init(Player* p, EnemyController* e) {
     enemyController = e;
 
     addMap("Overworld_Map", std::make_unique<OverworldMap>());
+    addMap("TestDungeon_Map", std::make_unique<TestDun>());
 
-    loadMap("Overworld_Map");
+    //loadMap("Overworld_Map");
+    loadMap("TestDungeon_Map");
 }
 
 void MapManager::addMap(const std::string& id, std::unique_ptr<Tilemap> map) {

@@ -8,7 +8,7 @@ void Game::init() {
     m_mapManager.init(&player, &m_enemyController);
     player.init();
 
-    m_enemyController.init("Test_Map");
+    //m_enemyController.init("Test_Map");
     //skely.init(20, 10, "assets/enemy/Skeleton.png");
 }
 

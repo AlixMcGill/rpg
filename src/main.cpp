@@ -16,7 +16,7 @@ int main() {
         game.update(deltaTime);
 
         BeginDrawing();
-        ClearBackground(GRAY);
+        ClearBackground(BLACK);
         game.draw();
         DrawFPS(1190, 10);
         EndDrawing();

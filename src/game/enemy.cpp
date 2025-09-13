@@ -7,6 +7,7 @@
 #include <ostream>
 #include <raylib.h>
 #include <string>
+#include <sys/types.h>
 
 Enemy::Enemy(int startX, int startY, Texture& textrue)
         : m_enemyTexture(textrue) {
@@ -186,13 +187,25 @@ bool Enemy::isColliding(const Rectangle& bounds, const std::vector<std::vector<s
     int startY = bounds.y / TILE_HEIGHT;
     int endY = (bounds.y + bounds.height) / TILE_HEIGHT;
 
+    //std::cout << "sX: " << startX << " sY: " << startY << " eX: " << endX << " eY: " << endY << std::endl;
+
+//    std::cout << "WorldY: " << (int)worldCollisionLayer.size() << 
+//        " WorldX: " << (int)worldCollisionLayer.size() << std::endl;
+
     for (int y = startY; y <= endY; y++) {
         for (int x = startX; x <= endX; x++) {
             // check if in bounds
-            /*if (y < 0 || y >= (int)worldCollisionLayer.size() ||
-                x < 0 || x >= (int)worldCollisionLayer.size()) {
+            if (y < 0 || y >= (int)worldCollisionLayer.size() ||
+                x < 0 || x >= (int)worldCollisionLayer[y].size()) {
                 continue; // Ignore tiles out of bounds
-            }*/
+            }
+
+/*            std::cout << "isColliding: y=" << y << " x=" << x
+          << " world.size()=" << (int)worldCollisionLayer.size()
+          << " world[y].size()=" << (y >= 0 && y < (int)worldCollisionLayer.size() ? (int)worldCollisionLayer[y].size() : -1)
+          << std::endl; */
+
+
 
             const sTile& tile = worldCollisionLayer[y][x];
 
@@ -233,6 +246,8 @@ void Enemy::updateAndCollide(float& moveX, float& moveY, const std::vector<std::
         if (currentState == WALK_UP || currentState == WALK_DOWN) {
             xPos = lerpDelta(xPos, xTileCenter, deltaTime, lerpSpeed);
         }
+    } else {
+        xPos = lerpDelta(xPos, -moveX + xPos, deltaTime, lerpSpeed); // This does not work well to remove enemies from walls find another solution
     }
 
     Rectangle futureY = m_getCollisionBounds(xPos, yPos + moveY);
@@ -241,6 +256,8 @@ void Enemy::updateAndCollide(float& moveX, float& moveY, const std::vector<std::
         if (currentState == WALK_RIGHT || currentState == WALK_LEFT) {
             yPos = lerpDelta(yPos, yTileCenter, deltaTime, lerpSpeed);
         }
+    } else {
+        yPos = lerpDelta(yPos, -moveY + yPos, deltaTime, lerpSpeed); // This does not work well to remove enemies from walls find another solution
     }
 }
 

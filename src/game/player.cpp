@@ -285,11 +285,10 @@ bool Player::isColliding(const Rectangle& playerBounds, const std::vector<std::v
     for (int y = startY; y <= endY; y++) {
         for (int x = startX; x <= endX; x++) {
             // check if in bounds
-            /*if (y < 0 || y >= (int)worldCollisionLayer.size() ||
-                x < 0 || x >= (int)worldCollisionLayer.size()) {
+            if (y < 0 || y >= (int)worldCollisionLayer.size() ||
+                x < 0 || x >= (int)worldCollisionLayer[y].size()) {
                 continue; // Ignore tiles out of bounds
-            }*/
-
+            }
             const sTile& tile = worldCollisionLayer[y][x];
 
             if (tile.id != -1) {

@@ -48,12 +48,19 @@ void EnemyController::init(std::string map) {
         // init the textures to be used in level
         textures["Skeleton"] = m_loadTexture("assets/enemy/Skeleton.png");
 
-        m_spawnSkeleton(10, 4, textures["Skeleton"]);
-        m_spawnSkeleton(13, 9, textures["Skeleton"]);
-        m_spawnSkeleton(19, 4, textures["Skeleton"]);
-        m_spawnSkeleton(23, 12, textures["Skeleton"]);
-        m_spawnSkeleton(8, 16, textures["Skeleton"]);
+        m_spawnSkeleton(10, 6, textures["Skeleton"]);
+        m_spawnSkeleton(13, 10, textures["Skeleton"]);
+        m_spawnSkeleton(19, 13, textures["Skeleton"]);
 
+    }
+    else if (map == "TestDungeon_Map") {
+        m_unload();
+
+        // init the textures to be used in level
+        textures["Skeleton"] = m_loadTexture("assets/enemy/Skeleton.png");
+
+        m_spawnSkeleton(24, 14, textures["Skeleton"]);
+        m_spawnSkeleton(18, 27, textures["Skeleton"]);
     }
 }
 void EnemyController::update(float deltaTime, float& playerXPos, float& playerYPos, Player& player, std::vector<std::vector<sTile>>& collisionLayer) {
@@ -167,5 +174,6 @@ void EnemyController::m_unload() {
 
 // Enemy Spawing Methods
 void EnemyController::m_spawnSkeleton(int x, int y, Texture& texture) {
+    std::cout << "[Spawed Enemy at: ]" << "x: " << x << " y: " << y << std::endl;
     enemies.push_back(std::make_unique<Skeleton>(x, y, texture));
 }
