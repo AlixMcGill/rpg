@@ -5,13 +5,15 @@
 
 #define MAX_TEXTURES 1
 
+class Player;
+
 class Tilemap {
 public:
     virtual ~Tilemap();
 
     bool debug = false;
 
-    virtual void load(float playerXPos, float PlayerYPos) = 0;
+    virtual void load(Player* p) = 0;
     virtual void unload() {unloadTilemap();}
     virtual void update(float deltaTime, float playerXPos, float playerYPos) {}
     virtual void draw() {renderMap();}
@@ -20,6 +22,8 @@ public:
     const Camera2D& getCamera() const {return camera;}
     std::vector<std::vector<sTile>>& getWorldCollisionLayer() {return worldCollisionLayer;}
     const std::vector<std::vector<sTile>>& getWorldCollisionLayer() const {return worldCollisionLayer;}
+    Texture2D& getTilemapTextrue();
+    const Texture2D& getTilemapTexture() const;
 
 protected:
     Texture2D textures[MAX_TEXTURES];

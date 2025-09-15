@@ -1,12 +1,12 @@
 #include "overworldMap.h"
 
-void OverworldMap::load(float playerXPos, float playerYPos) {
+void OverworldMap::load(Player* p) {
     loadTexture("assets/OverworldHandTileset.png");
     loadCSV("assets/maps/testMap/rpgmaptest_Tile Layer 1.csv");
     loadCSVAssetLayer("assets/maps/testMap/rpgmaptest_asset_Layer.csv");
     loadCSVCollisionLayer("assets/maps/testMap/rpgmaptest_coll_Layer.csv");
     initCamera();
-    updateCameraTarget(playerXPos, playerYPos);
+    updateCameraTarget(p->xPos, p->yPos);
 }
 
 void OverworldMap::update(float deltaTime, float playerXPos, float playerYPos) {

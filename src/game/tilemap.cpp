@@ -229,3 +229,11 @@ void Tilemap::m_loadCSV(const std::string& filename, std::vector<std::vector<sTi
         }
     }
 }
+
+Texture2D& Tilemap::getTilemapTextrue() {
+    return textures[TEXTURE_TILEMAP];
+}
+
+const Texture2D& Tilemap::getTilemapTexture() const {
+    return textures[TEXTURE_TILEMAP];
+}

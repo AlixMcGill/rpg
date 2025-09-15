@@ -24,7 +24,7 @@ void MapManager::loadMap(const std::string& id) {
     auto it = maps.find(id);
     if (it != maps.end()) {
         activeMap = it->second.get();
-        activeMap->load(player->xPos, player->yPos);
+        activeMap->load(player);
         enemyController->init(id);
     }
 }
