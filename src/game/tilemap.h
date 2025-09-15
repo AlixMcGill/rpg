@@ -34,6 +34,7 @@ protected:
     int mapHeight = 0;
     Camera2D camera;
     Vector2 cameraTarget;
+    float userZoom = 2.5f;
 
     void loadTexture(const char* imgPath);
     void destroyTextures();

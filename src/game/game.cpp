@@ -1,4 +1,5 @@
 #include "game.h"
+#include <raylib.h>
 
 void Game::init() {
     std::cout << "Game class init" << std::endl;

@@ -1,4 +1,5 @@
 #include "tilemap.h"
+#include <cmath>
 #include <raylib.h>
 #include <string>
 
@@ -78,10 +79,10 @@ void Tilemap::loadCSV(const std::string& filename) {
 }
 
 void Tilemap::renderMap() {
-    float camLeft = camera.target.x - GetScreenWidth() * 0.5f / camera.zoom;
-    float camTop = camera.target.y - GetScreenHeight() * 0.5f / camera.zoom;
-    float camRight = camLeft + GetScreenWidth() / camera.zoom;
-    float camBottom = camTop + GetScreenWidth() / camera.zoom;
+    float camLeft = camera.target.x - GetScreenWidth() * 0.5f;
+    float camTop = camera.target.y - GetScreenHeight() * 0.5f;
+    float camRight = camLeft + GetScreenWidth();
+    float camBottom = camTop + GetScreenWidth();
 
     int startX = std::max(0, (int)(camLeft / TILE_HEIGHT));
     int startY = std::max(0, (int)(camTop / TILE_HEIGHT));
@@ -134,25 +135,28 @@ void Tilemap::renderMap() {
 void Tilemap::initCamera() {
     camera = { 0 };
     camera.target = (Vector2){ 0, 0 };
-    camera.offset = (Vector2){ (float)windowWidth / 2, (float)windowHeight / 2};
+    camera.offset = (Vector2){ (float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2};
     camera.rotation = 0.0f;
     camera.zoom = 2.5f;
 }
 
 void Tilemap::cameraZoom() {
+    float scale = fminf((float)GetScreenWidth() / windowWidth, (float)GetScreenHeight() / windowHeight);
     float wheel = GetMouseWheelMove();
     if (wheel != 0) {
         const float zoomIncrement = 0.125f;
-        camera.zoom += (wheel * zoomIncrement);
+        userZoom += (wheel * zoomIncrement);
 
-        if (camera.zoom < 2.5f) camera.zoom = 2.5f;
-        if (camera.zoom > 4.0f) camera.zoom = 4.0f;
+        if (userZoom < 2.5f) userZoom = 2.5f;
+        if (userZoom > 4.0f) userZoom = 4.0f;
     }
-
-    camera.target = cameraTarget;
+    
+    camera.zoom = scale * userZoom;
+//    camera.target = cameraTarget;
 }
 
 void Tilemap::updateCameraTarget(float x, float y) {
+    camera.offset = (Vector2){ (float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2};
     camera.target = (Vector2){ x, y };
     cameraTarget.x = x;
     cameraTarget.y = y;
