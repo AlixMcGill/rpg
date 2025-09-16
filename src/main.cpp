@@ -11,35 +11,68 @@ int main() {
 
     game.init();
 
-    while (!WindowShouldClose()) { // Game loop
-        float deltaTime = GetFrameTime();
+    Shader crtShader = LoadShader("./src/shader/crt/crt.vs", "./src/shader/crt/crt.fs");
 
-        game.update(deltaTime);
+    int timeLoc      = GetShaderLocation(crtShader,"time");
+    int curveLoc     = GetShaderLocation(crtShader,"curvature");
+    int scanLoc      = GetShaderLocation(crtShader,"scanline");
+    int pixelLoc     = GetShaderLocation(crtShader,"pixelSize");
+    int glowLoc      = GetShaderLocation(crtShader,"glow");
+    int vignetteLoc  = GetShaderLocation(crtShader,"vignette");
+    int maskWidthLoc = GetShaderLocation(crtShader,"maskWidth");
+    int maskGapLoc   = GetShaderLocation(crtShader,"maskGap");
+    int maskIntLoc   = GetShaderLocation(crtShader,"maskIntensity");
 
+    float curvature      = 0.015f;
+    float scanline       = 0.001f;
+    float pixelSize      = 800.0f;
+    float glow           = 0.05f;
+    float vignette       = 0.5f;
+    float maskWidth      = 1.0/164.0; // 1/3 of pixel for RGB stripes
+    float maskGap        = 0.02;
+    float maskIntensity  = 0.008f;
+
+    RenderTexture2D target = LoadRenderTexture(windowWidth, windowHeight);
+
+    while (!WindowShouldClose()) {
+        float dt = GetFrameTime();
+        float t = GetTime();
+
+        SetShaderValue(crtShader,timeLoc,&t,SHADER_UNIFORM_FLOAT);
+        SetShaderValue(crtShader,curveLoc,&curvature,SHADER_UNIFORM_FLOAT);
+        SetShaderValue(crtShader,scanLoc,&scanline,SHADER_UNIFORM_FLOAT);
+        SetShaderValue(crtShader,pixelLoc,&pixelSize,SHADER_UNIFORM_FLOAT);
+        SetShaderValue(crtShader,glowLoc,&glow,SHADER_UNIFORM_FLOAT);
+        SetShaderValue(crtShader,vignetteLoc,&vignette,SHADER_UNIFORM_FLOAT);
+        SetShaderValue(crtShader,maskWidthLoc,&maskWidth,SHADER_UNIFORM_FLOAT);
+        SetShaderValue(crtShader,maskGapLoc,&maskGap,SHADER_UNIFORM_FLOAT);
+        SetShaderValue(crtShader,maskIntLoc,&maskIntensity,SHADER_UNIFORM_FLOAT);
+
+        game.update(dt);
+
+        // --- Draw game into render texture ---
+        BeginTextureMode(target);
+            ClearBackground(BLACK);
+            game.draw();
+        EndTextureMode();
+
+        // --- Draw to screen with shader ---
         BeginDrawing();
-        // Game drawing goes here
-        ClearBackground(BLACK);
-        game.draw();
-        DrawFPS(1190, 10);
+            ClearBackground(BLACK);
 
-       /* float scaleX = (float)GetScreenWidth() / windowWidth;
-        float scaleY = (float)GetScreenHeight() / windowHeight;
-        float scale = (scaleX < scaleY) ? scaleX : scaleY;
+            BeginShaderMode(crtShader);
+                // Important: flip vertically (RenderTexture is upside-down in raylib)
+                Rectangle src = { 0, 0, (float)target.texture.width, -(float)target.texture.height };
+                Rectangle dst = { 0, 0, (float)GetScreenWidth(), (float)GetScreenHeight() };
+                DrawTexturePro(target.texture, src, dst, {0, 0}, 0.0f, WHITE);
+            EndShaderMode();
 
-        int drawWidth = (int)(windowWidth * scale);
-        int drawHeight = (int)(windowHeight * scale);
-
-        int offsetX = (GetScreenWidth() - drawWidth) / 2;
-        int offsetY = (GetScreenHeight() - drawHeight) / 2;
-
-        Rectangle source = {0, 0, (float)target.texture.width, (float)-target.texture.height};
-        Rectangle dest = {(float)offsetX, (float)offsetY, (float)drawWidth, (float)drawHeight};
-
-        DrawTexturePro(target.texture, source, dest, (Vector2){0,0}, 0.0f, WHITE);
-*/
+            DrawFPS(10, 10); // UI drawn normally
         EndDrawing();
     }
 
+
+    UnloadShader(crtShader);
     game.destroy();
     CloseWindow();
     return 0;

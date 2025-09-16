@@ -10,37 +10,10 @@ void EnemyController::init(std::string map) {
         // init the textures to be used in level
         textures["Skeleton"] = m_loadTexture("assets/enemy/Skeleton.png");
 
-        m_spawnSkeleton(10, 20, textures["Skeleton"]);
-        m_spawnSkeleton(10, 22, textures["Skeleton"]);
-        m_spawnSkeleton(10, 24, textures["Skeleton"]);
-        m_spawnSkeleton(10, 18, textures["Skeleton"]);
-        m_spawnSkeleton(30, 18, textures["Skeleton"]);
-        m_spawnSkeleton(10, 38, textures["Skeleton"]);
-        m_spawnSkeleton(10, 28, textures["Skeleton"]);
-        m_spawnSkeleton(10, 20, textures["Skeleton"]);
-        m_spawnSkeleton(10, 22, textures["Skeleton"]);
-        m_spawnSkeleton(10, 24, textures["Skeleton"]);
-        m_spawnSkeleton(10, 18, textures["Skeleton"]);
-        m_spawnSkeleton(30, 18, textures["Skeleton"]);
-        m_spawnSkeleton(10, 38, textures["Skeleton"]);
-        m_spawnSkeleton(10, 28, textures["Skeleton"]);
-        m_spawnSkeleton(10, 20, textures["Skeleton"]);
-        m_spawnSkeleton(10, 22, textures["Skeleton"]);
-        m_spawnSkeleton(10, 24, textures["Skeleton"]);
-        m_spawnSkeleton(10, 18, textures["Skeleton"]);
-        m_spawnSkeleton(30, 18, textures["Skeleton"]);
-        m_spawnSkeleton(10, 38, textures["Skeleton"]);
-        m_spawnSkeleton(10, 28, textures["Skeleton"]);
-        m_spawnSkeleton(10, 20, textures["Skeleton"]);
-        m_spawnSkeleton(10, 22, textures["Skeleton"]);
-        m_spawnSkeleton(10, 24, textures["Skeleton"]);
-        m_spawnSkeleton(10, 18, textures["Skeleton"]);
-        m_spawnSkeleton(30, 18, textures["Skeleton"]);
-        m_spawnSkeleton(10, 38, textures["Skeleton"]);
-        m_spawnSkeleton(10, 20, textures["Skeleton"]);
-        m_spawnSkeleton(10, 22, textures["Skeleton"]);
-        m_spawnSkeleton(10, 24, textures["Skeleton"]);
-        m_spawnSkeleton(10, 18, textures["Skeleton"]);
+        m_spawnSkeleton(10, 6, textures["Skeleton"]);
+        m_spawnSkeleton(13, 10, textures["Skeleton"]);
+        m_spawnSkeleton(19, 13, textures["Skeleton"]);
+
     }
     else if (map == "Test_Map") {
         m_unload();
